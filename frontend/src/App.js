@@ -9,13 +9,12 @@ import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 import PartnerDashboard from "./pages/PartnerDashboard";
 import Footer from './components/Footer';
-import Adherer from './pages/adherer';
-import Payment from './pages/payment';
+import ReservationForm from './pages/reservationForm';
 import AgenceOffres from "./pages/AgenceOffres";
-import Personnaliser from './pages/Personnaliser';
 import ConfirmationPage from './pages/ConfirmationPage';
 import ResetPassword from './pages/ResetPassword';
-
+import NotFound from './pages/NotFound';
+import Adherer from './pages/adherer';
 
 export default function App() { 
   return (
@@ -28,14 +27,14 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/blog" element={<Blog />}/>
-         <Route path="/payment" element={<Payment />} />
-
-        <Route path="/agence/:id" element={<AgenceOffres />} />
-        <Route path="/personnaliser" element={<Personnaliser />} />
+        <Route path="/reservation" element={<ReservationForm />} />
+        <Route path="/confirmation" element={<ConfirmationPage />} />
+        <Route path="/agences/:id/offres" element={<AgenceOffres />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-        <Route path="/adherer" element={<Adherer />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/adherer" element={<Adherer />} />
+        <Route path="/notfound" element={<NotFound />} />
         <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />

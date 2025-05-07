@@ -5,7 +5,7 @@ import api from '../api';
 
 const navItems = [
   { label: 'Home', links: [
-      { name: 'À propos', path: '/about' },
+      { name: 'À propos', path: '/' },
       { name: 'Blog Communautaire', path: '/blog' },
       { name: 'Contactez-nous', path: '/contact' }
     ]

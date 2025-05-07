@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from 'axios';
+
 import api from "../api";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const [user, setUser] = useState(null);
   const [reservations, setReservations] = useState([]);
@@ -44,6 +47,18 @@ export default function Profile() {
     localStorage.removeItem('token');
     navigate("/auth");
   };
+const handleCancelReservation = async (id) => {
+  if (window.confirm("Voulez-vous vraiment annuler cette réservation ?")) {
+    try {
+      await axios.put(`http://localhost:8000/api/reservations/${id}`, { etat: "Annulée" }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, etat: "Annulée" } : r));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+};
 
   const openEditModal = () => {
     setEditName(user.name);
@@ -122,39 +137,56 @@ export default function Profile() {
             </p>
           </div>
           
-      <div className="flex flex-wrap justify-center md:justify-start gap-4">
-        <motion.button
-          onClick={openEditModal}
-          whileHover={{ scale: 1.05, y: -3 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
-          style={{ 
-            backgroundColor: colors.primary,
-            color: colors.base
-          }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-          Modifier mes infos
-        </motion.button>
+<div className="flex flex-wrap justify-center md:justify-start gap-4">
+  <motion.button
+    onClick={openEditModal}
+    whileHover={{ scale: 1.05, y: -3 }}
+    whileTap={{ scale: 0.95 }}
+    className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
+    style={{ 
+      backgroundColor: colors.primary,
+      color: colors.base
+    }}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+    Modifier mes infos
+  </motion.button>
 
-        <motion.button
-          onClick={() => navigate('/adherer')}
-          whileHover={{ scale: 1.05, y: -3 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
-          style={{ 
-            backgroundColor: colors.secondary,
-            color: colors.primary
-          }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          Devenir Partenaire
-        </motion.button>
-      </div>
+  {/* Nouveau bouton pour réserver une offre */}
+  <motion.button
+    onClick={() => navigate('/agences')}
+    whileHover={{ scale: 1.05, y: -3 }}
+    whileTap={{ scale: 0.95 }}
+    className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
+    style={{ 
+      backgroundColor: colors.secondary,
+      color: colors.primary
+    }}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+    </svg>
+    Réserver une offre
+  </motion.button>
+
+  <motion.button
+    onClick={() => navigate('/adherer')}
+    whileHover={{ scale: 1.05, y: -3 }}
+    whileTap={{ scale: 0.95 }}
+    className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
+    style={{ 
+      backgroundColor: colors.secondary,
+      color: colors.primary
+    }}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+    Devenir Partenaire
+  </motion.button>
+</div>
           
         </div>
 
@@ -262,6 +294,12 @@ export default function Profile() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  <button onClick={() => handleCancelReservation(trip.id)}
+                  className="mt-4 text-sm text-red-500 hover:underline"
+                  >
+                  Annuler la réservation
+                </button>
+
                 </motion.div>
               ))}
             </div>
