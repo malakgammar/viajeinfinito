@@ -1,78 +1,95 @@
-import { motion } from 'framer-motion';
-import { GlobeAltIcon, PhoneIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="bg-primary text-base py-16 mt-20">
-      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-4 gap-12">
-        <div className="space-y-4">
-          <h3 className="text-2xl font-bold bg-gradient-to-r from-base to-secondary bg-clip-text text-transparent">
+    <footer className="bg-primary text-white px-8 py-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-6 gap-8">
+        {/* Logo & Contact */}
+        <div>
+          <div className="text-3xl font-extrabold bg-gradient-to-r from-primary to-dark bg-clip-text text-transparent">
             ViajeInfinito
-          </h3>
-          <p className="text-sm text-dark opacity-90 leading-relaxed">
-            Votre passerelle vers des voyages extraordinaires. Nous sélectionnons avec soin les meilleures agences pour vos rêves d'évasion.
+          </div>
+          <p className="mt-4 text-sm text-white">
+            Dive into local recommendations for a truly authentic experience.
           </p>
+          <div className="flex items-center mt-4 space-x-2 text-sm">
+            <span>📞</span>
+            <span>Need help? Call us</span>
+          </div>
+          <div className="text-secondary font-bold text-lg">1-800-222-8888</div>
         </div>
-        
-        <div className="space-y-4">
-          <h4 className="text-xl font-semibold text-base">Navigation</h4>
-          <ul className="space-y-2">
-            <li>
-              <a href="/agencies" className="text-dark hover:text-secondary transition-colors">
-                Agences
-              </a>
-            </li>
-            <li>
-              <a href="/contact" className="text-dark hover:text-secondary transition-colors">
-                Contact
-              </a>
-            </li>
-            <li>
-              <a href="/profile" className="text-dark hover:text-secondary transition-colors">
-                Profil
-              </a>
-            </li>
+
+        {/* Company */}
+        <div>
+          <h4 className="font-semibold mb-2">Company</h4>
+          <ul className="space-y-1 text-sm text-white/70">
+            <li><Link to="/about" className="hover:text-secondary">About Us</Link></li>
+            <li><Link to="/blog" className="hover:text-secondary">Community Blog</Link></li>
+            <li><Link to="/careers" className="hover:text-secondary">Jobs & Careers</Link></li>
+            <li><Link to="/Contact" className="hover:text-secondary">Contact Us</Link></li>
+            <li><Link to="/awards" className="hover:text-secondary">Our Awards</Link></li>
           </ul>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="text-xl font-semibold text-base">Contact</h4>
-          <div className="space-y-3">
-            <div className="flex items-start">
-              <EnvelopeIcon className="h-5 w-5 mt-1 mr-2 text-dark" />
-              <div>
-                <p className="font-medium text-dark">Email</p>
-                <p className="text-sm text-dark opacity-90">contact@viajeinfinito.com</p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <PhoneIcon className="h-5 w-5 mt-1 mr-2 text-dark" />
-              <div>
-                <p className="font-medium text-dark">Téléphone</p>
-                <p className="text-sm text-dark opacity-90">+33 1 23 45 67 89</p>
-              </div>
-            </div>
-          </div>
+        {/* Services */}
+        <div>
+          <h4 className="font-semibold mb-2">Services</h4>
+          <ul className="space-y-1 text-sm text-white/70">
+            <li><Link to="/services/tour-guide" className="hover:text-secondary">Tour Guide</Link></li>
+            <li><Link to="/services/tour-booking" className="hover:text-secondary">Tour Booking</Link></li>
+            <li><Link to="/services/hotel-booking" className="hover:text-secondary">Hotel Booking</Link></li>
+            <li><Link to="/services/ticket-booking" className="hover:text-secondary">Ticket Booking</Link></li>
+            <li><Link to="/services/rental" className="hover:text-secondary">Rental Services</Link></li>
+          </ul>
         </div>
 
-        <div className="space-y-4">
-          <h4 className="text-xl font-semibold text-base">Réseaux sociaux</h4>
-          <div className="flex space-x-6">
-            {['Instagram', 'Twitter', 'Facebook'].map((network) => (
-              <motion.div 
-                key={network}
-                whileHover={{ scale: 1.1 }}
-                className="p-2 rounded-full bg-base/20 hover:bg-base/30 cursor-pointer"
-              >
-                <GlobeAltIcon className="h-6 w-6 text-dark" />
-              </motion.div>
-            ))}
+        {/* Legal */}
+        <div>
+          <h4 className="font-semibold mb-2">Legal</h4>
+          <ul className="space-y-1 text-sm text-white/70">
+            <li><Link to="/legal/terms" className="hover:text-secondary">Terms of Service</Link></li>
+            <li><Link to="/legal/privacy" className="hover:text-secondary">Privacy Policy</Link></li>
+            <li><Link to="/legal/cookies" className="hover:text-secondary">Cookies Policy</Link></li>
+            <li><Link to="/legal/data-processing" className="hover:text-secondary">Data Processing</Link></li>
+            <li><Link to="/legal/data-policy" className="hover:text-secondary">Data Policy</Link></li>
+          </ul>
+        </div>
+
+        {/* Support */}
+        <div>
+          <h4 className="font-semibold mb-2">Support</h4>
+          <ul className="space-y-1 text-sm text-white/70">
+            <li><Link to="/support/forum" className="hover:text-secondary">Forum Support</Link></li>
+            <li><Link to="/support/help-center" className="hover:text-secondary">Help Center</Link></li>
+            <li><Link to="/support/how-it-works" className="hover:text-secondary">How it works</Link></li>
+            <li><Link to="/support/security" className="hover:text-secondary">Security</Link></li>
+          </ul>
+        </div>
+
+        {/* Contact / Newsletter */}
+        <div>
+          <h4 className="font-semibold mb-2">Contact</h4>
+          <div className="bg-transparent border rounded-full flex items-center px-3 py-2 text-sm text-white/70">
+            <span className="mr-2">✉️</span>
+            <input
+              type="email"
+              placeholder="Your email"
+              className="bg-transparent outline-none flex-1 placeholder-white/60"
+            />
           </div>
+          <Link
+            to="/Contact"
+            className="block mt-4 bg-secondary text-primary text-center px-6 py-2 rounded-full hover:brightness-110"
+          >
+            Contact
+          </Link>
         </div>
       </div>
-      
-      <div className="border-t border-base/20 mt-12 pt-8 text-center text-sm text-dark opacity-80">
-        © 2023 ViajeInfinito. Tous droits réservés.
+
+      {/* Bottom bar */}
+      <div className="mt-12 border-t border-white/20 pt-6 flex flex-col md:flex-row justify-between text-xs text-white/70">
+        <p>© 2025 ViajeInfinito Inc. All rights reserved.</p>
+        <p className="mt-2 md:mt-0">Follow us</p>
       </div>
     </footer>
   );
