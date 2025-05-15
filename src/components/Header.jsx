@@ -105,10 +105,13 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* CTA */}
-        <button className="bg-primary text-white font-semibold px-5 py-2 rounded-full hover:brightness-110 transition">
-          Become Local Expert
-        </button>
+<Link 
+  to="/auth" 
+  className="bg-primary text-white font-semibold px-5 py-2 rounded-full hover:brightness-110 transition inline-block"
+>
+  Become Local Expert
+</Link>
+
       </div>
     </header>
   );

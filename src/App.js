@@ -4,7 +4,9 @@ import Home from './pages/Home';
 import Agencies from './pages/Agencies';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
-import Blog from './pages/Blog'
+import Blog from './pages/Blog';
+import Profile from './pages/Profile';
+import PartnerDashboard from "./pages/PartnerDashboard";
 import Footer from './components/Footer';
 
 export default function App() {
@@ -15,8 +17,10 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/agencies" element={<Agencies />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/profile" element={<Auth />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/blog" element={<Blog />}/>
+        <Route path="/partner/dashboard" element={<PartnerDashboard />} />
+        <Route path="/auth" element={<Auth />} />
       </Routes>
       <Footer />
     </Router>

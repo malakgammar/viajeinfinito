@@ -1,28 +1,15 @@
 import { motion } from 'framer-motion';
-import ReviewCard from '../components/ReviewCard';
 import { 
   InstagramIcon, 
   FacebookIcon, 
-  TwitterIcon, 
-  CameraIcon 
+  TwitterIcon 
 } from '../components/SocialIcons';
-const reviews = [
-  {
-    author: "Marie D.",
-    rating: 5,
-    text: "Une expérience incroyable en Thaïlande grâce à ViajeInfinito ! Tout était parfaitement organisé.",
-    avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-    photos: [
-      "https://source.unsplash.com/random/800x600?v=1",
-      "https://source.unsplash.com/random/800x600?v=2"
-    ]
-  },
-];
 
 export default function Contact() {
   return (
     <div className="pt-20 min-h-screen bg-base">
       <div className="container mx-auto px-6 py-12">
+        {/* Réseaux sociaux */}
         <motion.div 
           className="text-center mb-20"
           initial={{ opacity: 0 }}
@@ -42,62 +29,55 @@ export default function Contact() {
           </div>
         </motion.div>
 
-        {/* Section Avis Clients */}
-        <section className="mb-20">
-          <h2 className="text-4xl font-bold text-center mb-16 text-dark">Expériences voyageurs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {reviews.map((review, index) => (
-              <ReviewCard key={index} review={review} />
-            ))}
-          </div>
-        </section>
-
-        {/* Formulaire de Contact avec Upload Photo */}
+        {/* Formulaire de contact */}
         <motion.section 
           className="max-w-2xl mx-auto bg-primary/10 p-8 rounded-2xl shadow-xl"
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
         >
-          <h2 className="text-3xl font-bold text-center mb-8 text-dark">Partagez votre expérience</h2>
+          <h2 className="text-3xl font-bold text-center mb-8 text-dark">Contactez-nous</h2>
           <form className="space-y-6">
             <div>
               <label className="block text-dark font-medium mb-2">Nom</label>
               <input 
                 type="text" 
+                placeholder="Votre nom"
                 className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
               />
             </div>
-            
+
             <div>
               <label className="block text-dark font-medium mb-2">Email</label>
               <input 
                 type="email" 
+                placeholder="Votre adresse email"
                 className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
               />
             </div>
 
             <div>
-              <label className="block text-dark font-medium mb-2">Votre expérience</label>
-              <textarea 
-                rows="4"
+              <label className="block text-dark font-medium mb-2">Sujet</label>
+              <input 
+                type="text" 
+                placeholder="Sujet de votre message"
                 className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
-              ></textarea>
+              />
             </div>
 
             <div>
-              <label className="block text-dark font-medium mb-2">Ajouter des photos</label>
-              <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors">
-                <CameraIcon className="h-8 w-8 text-primary mr-2" />
-                <span className="text-primary font-medium">Glissez-déposez ou cliquez pour uploader</span>
-                <input type="file" multiple className="hidden" />
-              </div>
+              <label className="block text-dark font-medium mb-2">Message</label>
+              <textarea 
+                rows="5"
+                placeholder="Votre message..."
+                className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
+              ></textarea>
             </div>
 
             <button 
               type="submit"
               className="w-full bg-primary text-base py-3 rounded-lg font-semibold hover:bg-dark transition-colors"
             >
-              Publier votre expérience
+              Envoyer le message
             </button>
           </form>
         </motion.section>

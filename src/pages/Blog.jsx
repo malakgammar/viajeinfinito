@@ -19,8 +19,9 @@ const reviews = [
   },
 ];
 
-export default function Blog() {
-<div className="pt-20 min-h-screen bg-base">
+export default function Contact() {
+  return (
+    <div className="pt-20 min-h-screen bg-base">
       <div className="container mx-auto px-6 py-12">
         <motion.div 
           className="text-center mb-20"
@@ -50,5 +51,57 @@ export default function Blog() {
             ))}
           </div>
         </section>
-</div>
-</div>}
+
+        {/* Formulaire de Contact avec Upload Photo */}
+        <motion.section 
+          className="max-w-2xl mx-auto bg-primary/10 p-8 rounded-2xl shadow-xl"
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+        >
+          <h2 className="text-3xl font-bold text-center mb-8 text-dark">Partagez votre expérience</h2>
+          <form className="space-y-6">
+            <div>
+              <label className="block text-dark font-medium mb-2">Nom</label>
+              <input 
+                type="text" 
+                className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-dark font-medium mb-2">Email</label>
+              <input 
+                type="email" 
+                className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div>
+              <label className="block text-dark font-medium mb-2">Votre expérience</label>
+              <textarea 
+                rows="4"
+                className="w-full p-3 rounded-lg border border-primary/30 focus:ring-2 focus:ring-primary"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="block text-dark font-medium mb-2">Ajouter des photos</label>
+              <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-primary/30 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                <CameraIcon className="h-8 w-8 text-primary mr-2" />
+                <span className="text-primary font-medium">Glissez-déposez ou cliquez pour uploader</span>
+                <input type="file" multiple className="hidden" />
+              </div>
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full bg-primary text-base py-3 rounded-lg font-semibold hover:bg-dark transition-colors"
+            >
+              Publier votre expérience
+            </button>
+          </form>
+        </motion.section>
+      </div>
+    </div>
+  );
+}
