@@ -1,152 +1,232 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import api from "../api";
 
 export default function Auth() {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Signup states
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("client");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: ""
+  });
 
-  const toggleForm = () => setIsLogin(!isLogin);
+  // Couleurs de la palette verte
+  const colors = {
+    primary: '#73946B',
+    secondary: '#D2D0A0',
+    light: '#FAFAF7'
+  };
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Les mots de passe ne correspondent pas !");
-      return;
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/profile');
     }
+  }, [navigate]);
 
-    // Redirection selon le rôle
-    if (role === "client") {
-      navigate("/profile");
-    } else if (role === "partenaire") {
-      navigate("/partner/dashboard");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      if (isLogin) {
+        const { data } = await api.post('/login', {
+          email: formData.email,
+          password: formData.password
+        });
+        localStorage.setItem('token', data.token);
+        navigate(data.user.role === 'client' ? '/profile' : '/partner/dashboard');
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error("Les mots de passe ne correspondent pas");
+        }
+
+        const { data } = await api.post('/register', {
+          name: formData.fullName,
+          email: formData.email,
+          telephone: formData.phone, // Modification clé pour le backend
+          password: formData.password,
+          password_confirmation: formData.confirmPassword
+        });
+        
+        localStorage.setItem('token', data.token);
+        navigate('/profile');
+      }
+    } catch (err) {
+      console.error("Erreur API:", err.response?.data);
+      setError(err.response?.data?.message || err.message || "Erreur inconnue");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="pt-20 min-h-screen flex items-center justify-center bg-base px-4">
+    <div 
+      className="pt-20 min-h-screen flex items-center justify-center px-4"
+      style={{ backgroundColor: colors.light }}
+    >
       <div className="w-full max-w-md bg-white shadow-xl rounded-2xl overflow-hidden">
         <div className="p-8">
           <AnimatePresence mode="wait">
-            {isLogin ? (
-              <motion.div
-                key="login"
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 50 }}
-                transition={{ duration: 0.3 }}
+            <motion.div
+              key={isLogin ? 'login' : 'register'}
+              initial={{ opacity: 0, x: isLogin ? -50 : 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isLogin ? 50 : -50 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 
+                className="text-2xl font-bold mb-6 text-center"
+                style={{ color: colors.primary }}
               >
-                <h2 className="text-2xl font-bold mb-6 text-center text-dark">Connexion</h2>
-                <form className="space-y-5">
+                {isLogin ? 'Connexion' : 'Inscription'}
+              </h2>
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
                   <div>
-                    <label className="block mb-1 text-dark font-medium">Email</label>
-                    <input type="email" className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary" />
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-dark font-medium">Mot de passe</label>
-                    <input type="password" className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary" />
-                  </div>
-                  <button type="submit" className="w-full bg-primary text-white py-3 rounded-lg hover:bg-dark transition-colors font-semibold">
-                    Se connecter
-                  </button>
-                </form>
-                <p className="mt-6 text-center text-sm">
-                  Pas encore inscrit ?{" "}
-                  <button onClick={toggleForm} className="text-primary hover:underline font-medium">
-                    Créez un compte
-                  </button>
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="register"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h2 className="text-2xl font-bold mb-6 text-center text-dark">Inscription</h2>
-                <form onSubmit={handleRegister} className="space-y-5">
-                  <div>
-                    <label className="block mb-1 text-dark font-medium">Nom complet</label>
+                    <label className="block mb-1 font-medium" style={{ color: colors.primary }}>
+                      Nom complet
+                    </label>
                     <input
                       type="text"
-                      className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      name="fullName"
+                      className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
+                      style={{
+                        borderColor: `${colors.primary}80`,
+                        focusRingColor: colors.primary
+                      }}
+                      value={formData.fullName}
+                      onChange={handleChange}
                       required
                     />
                   </div>
+                )}
+
+                <div>
+                  <label className="block mb-1 font-medium" style={{ color: colors.primary }}>
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
+                    style={{
+                      borderColor: `${colors.primary}80`,
+                      focusRingColor: colors.primary
+                    }}
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {!isLogin && (
                   <div>
-                    <label className="block mb-1 text-dark font-medium">Email</label>
-                    <input
-                      type="email"
-                      className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-dark font-medium">Téléphone</label>
+                    <label className="block mb-1 font-medium" style={{ color: colors.primary }}>
+                      Téléphone
+                    </label>
                     <input
                       type="tel"
-                      className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      name="phone"
+                      className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
+                      style={{
+                        borderColor: `${colors.primary}80`,
+                        focusRingColor: colors.primary
+                      }}
+                      value={formData.phone}
+                      onChange={handleChange}
                       required
                     />
                   </div>
+                )}
+
+                <div>
+                  <label className="block mb-1 font-medium" style={{ color: colors.primary }}>
+                    Mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
+                    style={{
+                      borderColor: `${colors.primary}80`,
+                      focusRingColor: colors.primary
+                    }}
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    minLength="6"
+                  />
+                </div>
+
+                {!isLogin && (
                   <div>
-                    <label className="block mb-1 text-dark font-medium">Rôle</label>
-                    <select
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="client">Client</option>
-                      <option value="partenaire">Partenaire</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block mb-1 text-dark font-medium">Mot de passe</label>
+                    <label className="block mb-1 font-medium" style={{ color: colors.primary }}>
+                      Confirmer le mot de passe
+                    </label>
                     <input
                       type="password"
-                      className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      name="confirmPassword"
+                      className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
+                      style={{
+                        borderColor: `${colors.primary}80`,
+                        focusRingColor: colors.primary
+                      }}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
                       required
+                      minLength="6"
                     />
                   </div>
-                  <div>
-                    <label className="block mb-1 text-dark font-medium">Confirmer le mot de passe</label>
-                    <input
-                      type="password"
-                      className="w-full p-3 border rounded-lg border-primary/30 focus:ring-2 focus:ring-primary"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </div><button type="submit" className="w-full bg-primary text-white py-3 rounded-lg hover:bg-dark transition-colors font-semibold">
-                    S'inscrire
-                  </button>
-                </form>
-                <p className="mt-6 text-center text-sm">
-                  Déjà inscrit ?{" "}
-                  <button onClick={toggleForm} className="text-primary hover:underline font-medium">
-                    Se connecter
-                  </button>
-                </p>
-              </motion.div>
-            )}
+                )}
+
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                  style={{ 
+                    backgroundColor: colors.primary,
+                    color: 'white'
+                  }}
+                >
+                  {loading ? 'Chargement...' : isLogin ? 'Se connecter' : 'S\'inscrire'}
+                </motion.button>
+              </form>
+
+              <p className="mt-6 text-center text-sm" style={{ color: colors.primary }}>
+                {isLogin ? 'Pas encore inscrit ?' : 'Déjà un compte ?'}{' '}
+                <button
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="font-medium hover:underline"
+                  style={{ color: colors.primary }}
+                >
+                  {isLogin ? 'Créer un compte' : 'Se connecter'}
+                </button>
+              </p>
+            </motion.div>
           </AnimatePresence>
         </div>
       </div>

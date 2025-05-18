@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ReservationController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return response()->json(Reservation::with(['user', 'offre'])->get());
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_user' => 'required|exists:users,id',
+            'id_offre' => 'required|exists:offres,id',
+            'nbPersonne' => 'required|integer|min:1',
+            'total' => 'required|numeric',
+            'date' => 'required|date',
+            'duration' => 'required|integer|min:1'
+        ]);
+
+        $reservation = Reservation::create($validated);
+        return response()->json($reservation, 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
