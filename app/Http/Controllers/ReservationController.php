@@ -40,16 +40,21 @@ class ReservationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, Reservation $reservation)
+{
+    $validated = $request->validate([
+      'etat' => 'required|string|in:Confirmée,Annulée'
+    ]);
+    $reservation->update(['etat' => $validated['etat']]);
+    return response()->json($reservation);
+}
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function destroy(Reservation $reservation)
+{
+    $reservation->delete();
+    return response()->noContent();
+}
 }

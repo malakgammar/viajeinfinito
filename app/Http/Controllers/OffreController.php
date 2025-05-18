@@ -9,7 +9,7 @@ class OffreController extends Controller
 {
     /**
      * Affiche la liste des offres
-     */
+     */ 
     public function index()
     {
         $offres = Offre::with(['user', 'reservations'])->get();
@@ -50,6 +50,9 @@ class OffreController extends Controller
      */
     public function update(Request $request, Offre $offre)
     {
+        if ($request->user()->id !== $offre->user_id) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
         $validated = $request->validate([
             'destination' => 'sometimes|string|max:255',
             'date' => 'sometimes|date',
@@ -68,21 +71,25 @@ class OffreController extends Controller
     /**
      * Supprime une offre
      */
-    public function destroy(Offre $offre)
-    {
-        $offre->delete();
-        return response()->json(null, 204);
+   public function destroy(Offre $offre)
+{
+    if (auth()->user()->id !== $offre->user_id) {
+        return response()->json(['message' => 'Unauthorized'], 403);
     }
+
+    $offre->delete();
+    return response()->json(null, 204);
+}
 
     /**
      * Récupère les offres d'un utilisateur spécifique
      */
-    public function userOffres($userId)
-    {
-        $offres = Offre::where('user_id', $userId)
-                      ->with(['reservations'])
-                      ->get();
-        
-        return response()->json($offres);
-    }
+    public function userOffres(Request $request)
+{
+    $userId = $request->user()->id;
+    $offres = Offre::where('user_id', $userId)
+                  ->with(['reservations'])
+                  ->get();
+    return response()->json($offres);
+}
 }

@@ -1,15 +1,15 @@
 <?php
 // app/Http/Controllers/AuthController.php
+
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     /**
-     * Handle login
+     * Handle login (pas de session, juste Sanctum token)
      */
     public function login(Request $request)
     {
@@ -18,25 +18,32 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Identifiants invalides'], 401);
+        if (! Auth::once($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         $user  = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken(
+            'api-token',
+            ['*'],
+            now()->addDays(30)
+        )->plainTextToken;
 
         return response()->json([
-            'token' => $token,
-            'user'  => $user,
+            'token'      => $token,
+            'expires_at' => now()->addDays(30)->toDateTimeString(),
         ]);
     }
 
     /**
-     * Handle logout
+     * Handle logout (supprime le token courant)
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->user()
+                ->currentAccessToken()
+                ->delete();
+
         return response()->json(['message' => 'Déconnecté']);
     }
 }

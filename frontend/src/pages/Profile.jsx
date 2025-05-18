@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import api from "../api";
 
 export default function Profile() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [trips, setTrips] = useState([]);
+  const [reservations, setReservations] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
-  const [editPhone, setEditPhone] = useState("");
+  const [editTelephone, setEditTelephone] = useState("");
   const [expandedTrip, setExpandedTrip] = useState(null);
 
   const colors = {
@@ -21,26 +22,22 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    const fakeUser = {
-      name: "test user",
-      email: "user@example.com",
-      phone: "+33 6 12 34 56 78"
-    };
-    const fakeTrips = [
-      { 
-        id: 1, 
-        destination: "Thaïlande", 
-        date: "2024-11-12", 
-        duration: "15 jours",
-        travelers: 2,
-        budget: "€€",
-        status: "Terminée",
-        description: "Voyage culturel à travers Bangkok, Chiang Mai et les îles du sud. Découverte des temples et de la cuisine locale."
-      }
-    ];
-
-    setUser(fakeUser);
-    setTrips(fakeTrips);
+    api.get('/user/profile')
+      .then(res => {
+        setUser(res.data);
+        setEditName(res.data.name);
+        setEditEmail(res.data.email);
+        setEditTelephone(res.data.telephone || '');
+        return api.get('/user/reservations');
+      })
+      .then(res => setReservations(res.data))
+      .catch(err => {
+        console.error("Erreur API:", err.response?.data || err.message);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/auth');
+        }
+      });
   }, []);
 
   const handleLogout = () => {
@@ -51,7 +48,7 @@ export default function Profile() {
   const openEditModal = () => {
     setEditName(user.name);
     setEditEmail(user.email);
-    setEditPhone(user.phone);
+    setEditTelephone(user.telephone);
     setIsEditing(true);
   };
 
@@ -61,13 +58,18 @@ export default function Profile() {
 
   const handleSaveEdit = (e) => {
     e.preventDefault();
-    setUser({ 
-      ...user, 
-      name: editName, 
+    api.put('/user/profile', {
+      name: editName,
       email: editEmail,
-      phone: editPhone
+      telephone: editTelephone,
+    })
+    .then(res => {
+      setUser(res.data);
+      setIsEditing(false);
+    })
+    .catch(err => {
+      console.error(err);
     });
-    setIsEditing(false);
   };
 
   const toggleTripDetails = (tripId) => {
@@ -116,7 +118,7 @@ export default function Profile() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              {user.phone}
+              {user.telephone}
             </p>
           </div>
           
@@ -139,7 +141,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Historique voyages */}
+        {/* Historique réservations */}
         <section>
           <div className="flex items-center mb-8 gap-4 justify-center md:justify-start">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
@@ -152,22 +154,22 @@ export default function Profile() {
                 borderBottom: `3px solid ${colors.secondary}`
               }}
             >
-              Mes voyages
+              Mes réservations
             </h2>
           </div>
           
-          {trips.length === 0 ? (
+          {reservations.length === 0 ? (
             <div className="text-center py-12">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <p className="text-xl font-medium mb-6" style={{ color: colors.primary }}>
-                Aucun voyage enregistré.
+                Aucune réservation enregistrée.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {trips.map((trip) => (
+              {reservations.map((trip) => (
                 <motion.div
                   key={trip.id}
                   whileHover={{ y: -3 }}
@@ -344,8 +346,8 @@ export default function Profile() {
                   </label>
                   <input
                     type="tel"
-                    value={editPhone}
-                    onChange={(e) => setEditPhone(e.target.value)}
+                    value={editTelephone}
+                    onChange={(e) => setEditTelephone(e.target.value)}
                     className="w-full p-3 rounded-lg border focus:ring-2 focus:outline-none"
                     style={{ 
                       borderColor: colors.primary + '50',

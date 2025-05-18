@@ -1,3 +1,4 @@
+// src/components/Auth.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -5,37 +6,37 @@ import api from "../api";
 
 export default function Auth() {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
+  const [isLogin, setIsLogin]     = useState(true);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
+  const [formData, setFormData]   = useState({
+    fullName:        "",
+    email:           "",
+    phone:           "",
+    password:        "",
     confirmPassword: ""
   });
 
-  // Couleurs de la palette verte
+  // Palette de couleurs
   const colors = {
-    primary: '#73946B',
+    primary:   '#73946B',
     secondary: '#D2D0A0',
-    light: '#FAFAF7'
+    light:     '#FAFAF7'
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
+  // Redirige si déjà authentifié
   useEffect(() => {
     if (localStorage.getItem('token')) {
       navigate('/profile');
     }
   }, [navigate]);
+
+  const handleChange = (e) => {
+    setFormData(fd => ({
+      ...fd,
+      [e.target.name]: e.target.value
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,32 +44,41 @@ export default function Auth() {
     setError("");
 
     try {
-      if (isLogin) {
-        const { data } = await api.post('/login', {
-          email: formData.email,
-          password: formData.password
-        });
-        localStorage.setItem('token', data.token);
-        navigate(data.user.role === 'client' ? '/profile' : '/partner/dashboard');
-      } else {
-        if (formData.password !== formData.confirmPassword) {
-          throw new Error("Les mots de passe ne correspondent pas");
-        }
+      // Appel login ou register
+      const endpoint = isLogin ? '/login' : '/register';
+      const payload = isLogin
+        ? { email: formData.email, password: formData.password }
+        : {
+            name:                  formData.fullName,
+            email:                 formData.email,
+            telephone:             formData.phone,
+            password:              formData.password,
+            password_confirmation: formData.confirmPassword
+          };
 
-        const { data } = await api.post('/register', {
-          name: formData.fullName,
-          email: formData.email,
-          telephone: formData.phone, // Modification clé pour le backend
-          password: formData.password,
-          password_confirmation: formData.confirmPassword
-        });
-        
-        localStorage.setItem('token', data.token);
+      const { data } = await api.post(endpoint, payload);
+
+      // Stockage du token + configuration Axios
+      localStorage.setItem('token', data.token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+
+      // Récupère le profil pour le rôle
+      const profile = await api.get('/user/profile');
+      const user    = profile.data;
+
+      // Redirection selon rôle
+      if (isLogin) {
+        navigate(user.role === 'client' ? '/profile' : '/partner/dashboard');
+      } else {
         navigate('/profile');
       }
     } catch (err) {
-      console.error("Erreur API:", err.response?.data);
-      setError(err.response?.data?.message || err.message || "Erreur inconnue");
+      console.error("Erreur API:", err.response?.data || err);
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Erreur inconnue"
+      );
     } finally {
       setLoading(false);
     }
@@ -112,10 +122,7 @@ export default function Auth() {
                       type="text"
                       name="fullName"
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
-                      style={{
-                        borderColor: `${colors.primary}80`,
-                        focusRingColor: colors.primary
-                      }}
+                      style={{ borderColor: `${colors.primary}80` }}
                       value={formData.fullName}
                       onChange={handleChange}
                       required
@@ -131,10 +138,7 @@ export default function Auth() {
                     type="email"
                     name="email"
                     className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
-                    style={{
-                      borderColor: `${colors.primary}80`,
-                      focusRingColor: colors.primary
-                    }}
+                    style={{ borderColor: `${colors.primary}80` }}
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -150,10 +154,7 @@ export default function Auth() {
                       type="tel"
                       name="phone"
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
-                      style={{
-                        borderColor: `${colors.primary}80`,
-                        focusRingColor: colors.primary
-                      }}
+                      style={{ borderColor: `${colors.primary}80` }}
                       value={formData.phone}
                       onChange={handleChange}
                       required
@@ -169,10 +170,7 @@ export default function Auth() {
                     type="password"
                     name="password"
                     className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
-                    style={{
-                      borderColor: `${colors.primary}80`,
-                      focusRingColor: colors.primary
-                    }}
+                    style={{ borderColor: `${colors.primary}80` }}
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -189,10 +187,7 @@ export default function Auth() {
                       type="password"
                       name="confirmPassword"
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:outline-none"
-                      style={{
-                        borderColor: `${colors.primary}80`,
-                        focusRingColor: colors.primary
-                      }}
+                      style={{ borderColor: `${colors.primary}80` }}
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
