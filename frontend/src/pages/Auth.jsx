@@ -63,7 +63,7 @@ export default function Auth() {
       api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 
       // Récupère le profil pour le rôle
-      const profile = await api.get('/user/profile');
+      const profile = await api.get('/profile');
       const user    = profile.data;
 
       // Redirection selon rôle

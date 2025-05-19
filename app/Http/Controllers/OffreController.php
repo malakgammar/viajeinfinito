@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Offre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class OffreController extends Controller
 {
@@ -22,7 +24,7 @@ class OffreController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            
             'destination' => 'required|string|max:255',
             'date' => 'required|date',
             'duration' => 'required|integer|min:1',
@@ -32,6 +34,7 @@ class OffreController extends Controller
             'description' => 'required|string',
             'url_image' => 'required|url'
         ]);
+        $validated['user_id'] = Auth::id();
 
         $offre = Offre::create($validated);
         return response()->json($offre, 201);

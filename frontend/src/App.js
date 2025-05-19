@@ -6,6 +6,7 @@ import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import Blog from './pages/Blog';
 import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 import PartnerDashboard from "./pages/PartnerDashboard";
 import Footer from './components/Footer';
 import Personnaliser from './pages/Personnaliser';
@@ -18,6 +19,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/agences" element={<Agences />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/blog" element={<Blog />}/>

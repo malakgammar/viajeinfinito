@@ -51,7 +51,7 @@ export default function Header() {
     // Vérifie si l'utilisateur est connecté
     const fetchUser = async () => {
       try {
-        const res = await api.get('/user/profile');
+        const res = await api.get('/v1/profile');
         setUser(res.data);
       } catch (err) {
         setUser(null);

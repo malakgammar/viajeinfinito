@@ -22,7 +22,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    api.get('/user/profile')
+    api.get('/profile')
       .then(res => {
         setUser(res.data);
         setEditName(res.data.name);
@@ -58,7 +58,7 @@ export default function Profile() {
 
   const handleSaveEdit = (e) => {
     e.preventDefault();
-    api.put('/user/profile', {
+    api.put('/profile', {
       name: editName,
       email: editEmail,
       telephone: editTelephone,
