@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // bien écrire { jwtDecode }
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 export default function ReservationForm() {
   const { state } = useLocation();
@@ -9,26 +10,31 @@ export default function ReservationForm() {
   const navigate = useNavigate();
 
   const [userId, setUserId] = useState(null);
+  const [tokenValid, setTokenValid] = useState(false);
+  const [priceAnimation, setPriceAnimation] = useState(false);
 
-  // Récupération de l'ID utilisateur depuis le token
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token && token.split('.').length === 3) {
-      try {
-        const decoded = jwtDecode(token);
-        setUserId(decoded.id || decoded.sub); // selon la structure de ton token
-      } catch (error) {
-        console.error("Erreur lors du décodage du token :", error.message);
-      }
-    } else {
-      console.warn("Token JWT invalide ou manquant.");
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode(token);
+      const userIdFromToken = decoded.userId || decoded.id || decoded.sub;
+      if (!userIdFromToken) throw new Error("ID utilisateur non trouvé");
+      if (decoded.exp && Date.now() >= decoded.exp * 1000) throw new Error("Token expiré");
+
+      setUserId(userIdFromToken);
+      setTokenValid(true);
+    } catch (error) {
+      console.error("Erreur de token:", error.message);
+      localStorage.removeItem("token");
     }
   }, []);
 
   const [form, setForm] = useState({
     nbPersonne: 1,
     date: "",
-    duration: 1,
+    duration: offer?.duration || 1,
     cardNumber: "",
     cardName: "",
     cvv: "",
@@ -36,75 +42,211 @@ export default function ReservationForm() {
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => {
+      const newForm = { ...prev, [name]: value };
+      
+      // Déclencher l'animation quand le nombre de personnes change
+      if (name === "nbPersonne") {
+        setPriceAnimation(true);
+        setTimeout(() => setPriceAnimation(false), 1000);
+      }
+      
+      return newForm;
+    });
   };
 
-  const total = offer.price * form.nbPersonne;
+  const calculateTotal = () => {
+    if (!offer) return 0;
+    return offer.price * form.nbPersonne * form.duration;
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const [total, setTotal] = useState(calculateTotal());
 
-  if (!userId) {
-    console.warn("User ID non disponible pour la réservation.");
-    return;
-  }
+  useEffect(() => {
+    setTotal(calculateTotal());
+  }, [form.nbPersonne, form.duration, offer]);
 
-  try {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.post(
-      "http://localhost:8000/api/v1/reservations",
-      {
-        id_user: userId,
-        id_offre: offer.id,
-        nbPersonne: form.nbPersonne,
-        total,
-        date: form.date,
-        duration: form.duration,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    navigate("/confirmation", {
-      state: { reservation: response.data, payment: form, offer },
-    });
-  } catch (err) {
-    if (err.response) {
-      console.error("Erreur lors de la réservation :", err.response.data);
-    } else {
-      console.error("Erreur lors de la réservation :", err.message);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!userId || !tokenValid) {
+      navigate("/login");
+      return;
     }
-  }
-};
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/reservations",
+        {
+          id_user: userId,
+          id_offre: offer.id,
+          nbPersonne: form.nbPersonne,
+          total,
+          date: form.date,
+          duration: form.duration,
+        },
+        { 
+          headers: { 
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json"
+          } 
+        }
+      );
+
+      navigate("/confirmation", { state: { reservation: response.data, offer } });
+    } catch (err) {
+      console.error("Erreur:", err.response?.data || err.message);
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        setTokenValid(false);
+      }
+    }
+  };
 
   return (
-    <div className="pt-20 px-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-6">Réserver l’offre</h1>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
-        <input type="number" name="nbPersonne" min={1} value={form.nbPersonne} onChange={handleChange} className="input" placeholder="Nombre de personnes" />
-        <input type="date" name="date" value={form.date} onChange={handleChange} className="input" />
-        <input type="number" name="duration" min={1} value={form.duration} onChange={handleChange} className="input" placeholder="Durée (jours)" />
+    <div className="min-h-screen pt-24 px-4 bg-[#F8F8F8]">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-[#73946B] p-6 text-white">
+            <h1 className="text-2xl font-bold">Réserver l'offre</h1>
+            {offer && (
+              <p className="mt-2 text-[#D2D0A0]">
+                {offer.destination} - {offer.price}€/personne/jour
+              </p>
+            )}
+          </div>
 
-        <hr className="my-4" />
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-[#73946B]">Détails de la réservation</h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre de personnes × durée (jours)
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="number"
+                      name="nbPersonne"
+                      min={1}
+                      max={20}
+                      value={form.nbPersonne}
+                      onChange={handleChange}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      name="duration"
+                      min={1}
+                      value={form.duration}
+                      onChange={handleChange}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                    />
+                  </div>
+                </div>
+              </div>
 
-        <h2 className="text-xl font-semibold">Paiement</h2>
-        <input name="cardName" value={form.cardName} onChange={handleChange} className="input" placeholder="Nom sur la carte" />
-        <input name="cardNumber" value={form.cardNumber} onChange={handleChange} className="input" placeholder="Numéro de carte" />
-        <div className="flex gap-4">
-          <input name="expiry" value={form.expiry} onChange={handleChange} className="input" placeholder="MM/AA" />
-          <input name="cvv" value={form.cvv} onChange={handleChange} className="input" placeholder="CVV" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={form.date}
+                  onChange={handleChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200 space-y-4">
+              <h2 className="text-lg font-semibold text-[#73946B]">Paiement</h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom sur la carte</label>
+                <input
+                  name="cardName"
+                  value={form.cardName}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                  placeholder="Nom complet"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Numéro de carte</label>
+                <input
+                  name="cardNumber"
+                  value={form.cardNumber}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                  placeholder="1234 5678 9012 3456"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Expiration</label>
+                  <input
+                    name="expiry"
+                    value={form.expiry}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                    placeholder="MM/AA"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                  <input
+                    name="cvv"
+                    value={form.cvv}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#73946B]"
+                    placeholder="123"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <span className="text-lg font-medium">Total:</span>
+                  <p className="text-sm text-gray-500">
+                    {form.nbPersonne} personne{form.nbPersonne > 1 ? 's' : ''} × {form.duration} jour{form.duration > 1 ? 's' : ''} × {offer?.price}€
+                  </p>
+                </div>
+                <motion.div
+                  key={total}
+                  initial={priceAnimation ? { scale: 1.2, color: "#5a7a52" } : {}}
+                  animate={priceAnimation ? { scale: 1, color: "#73946B" } : {}}
+                  transition={{ duration: 0.5 }}
+                  className="text-2xl font-bold"
+                  style={{ color: "#73946B" }}
+                >
+                  {total}€
+                </motion.div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!userId || !tokenValid || !form.date}
+                className={`w-full py-3 px-4 rounded-lg font-bold text-white ${
+                  tokenValid && form.date
+                    ? "bg-[#73946B] hover:bg-[#5a7a52]"
+                    : "bg-gray-400 cursor-not-allowed"
+                } transition-colors`}
+              >
+                {tokenValid ? "Confirmer la réservation" : "Authentification requise"}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <p className="text-lg font-bold mt-4">Total : {total}€</p>
-
-<button
-  type="submit"
-  disabled={!userId}
-  className="bg-primary text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
->
-  Confirmer la réservation
-</button>
-      </form>
+      </div>
     </div>
   );
 }

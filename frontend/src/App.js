@@ -13,7 +13,7 @@ import ReservationForm from './pages/reservationForm';
 import AgenceOffres from "./pages/AgenceOffres";
 import ConfirmationPage from './pages/ConfirmationPage';
 import ResetPassword from './pages/ResetPassword';
-
+import NotFound from './pages/NotFound';
 
 export default function App() { 
   return (
@@ -32,6 +32,7 @@ export default function App() {
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/notfound" element={<NotFound />} />
         <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />

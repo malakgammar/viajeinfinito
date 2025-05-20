@@ -14,6 +14,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Blog = lazy(() => import('./pages/Blog'));
 const Auth = lazy(() => import('./pages/Auth'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Reservation = lazy(() => import('./pages/reservationForm'));
 const Personnaliser = lazy(() => import('./pages/Personnaliser'));
 const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
@@ -58,6 +59,17 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
+                <Route
+                  path="/reservation"
+                  element={
+                    <RequireAuth>
+                      <RequireRole allowedRoles={['client']}>
+                        <Reservation />
+                      </RequireRole>
+                    </RequireAuth>
+                  }
+                />
+
                 <Route
                   path="/confirmation"
                   element={
