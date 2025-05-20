@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from 'axios';
+
 import api from "../api";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const [user, setUser] = useState(null);
   const [reservations, setReservations] = useState([]);
@@ -44,6 +47,18 @@ export default function Profile() {
     localStorage.removeItem('token');
     navigate("/auth");
   };
+const handleCancelReservation = async (id) => {
+  if (window.confirm("Voulez-vous vraiment annuler cette réservation ?")) {
+    try {
+      await axios.put(`http://localhost:8000/api/reservations/${id}`, { etat: "Annulée" }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, etat: "Annulée" } : r));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+};
 
   const openEditModal = () => {
     setEditName(user.name);
@@ -262,6 +277,12 @@ export default function Profile() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  <button onClick={() => handleCancelReservation(trip.id)}
+                  className="mt-4 text-sm text-red-500 hover:underline"
+                  >
+                  Annuler la réservation
+                </button>
+
                 </motion.div>
               ))}
             </div>

@@ -8,10 +8,8 @@ import Blog from './pages/Blog';
 import Profile from './pages/Profile';
 import PartnerDashboard from "./pages/PartnerDashboard";
 import Footer from './components/Footer';
-import Adherer from './pages/adherer';
-import Payment from './pages/payment';
+import ReservationForm from './pages/reservationForm';
 import AgenceOffres from "./pages/AgenceOffres";
-import Personnaliser from './pages/Personnaliser';
 import ConfirmationPage from './pages/ConfirmationPage';
 
 export default function App() {
@@ -24,13 +22,11 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/blog" element={<Blog />}/>
-         <Route path="/payment" element={<Payment />} />
-
+        <Route path="/reservation" element={<ReservationForm />} />
+        <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/agence/:id" element={<AgenceOffres />} />
-        <Route path="/personnaliser" element={<Personnaliser />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-        <Route path="/adherer" element={<Adherer />} />
         <Route path="/auth" element={<Auth />} />
       </Routes>
       <Footer />

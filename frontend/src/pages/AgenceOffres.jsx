@@ -6,9 +6,10 @@ export default function AgenceOffres() {
   const agence = location.state;
 const navigate = useNavigate();
 
-const handleReservation = (agence) => {
-  navigate("/confirmation", { state: { offer: agence } });
+const handleReservation = (offer) => {
+  navigate("/reservation", { state: { offer } });
 };
+
   if (!agence) return <div className="pt-20 text-center">Aucune donnée disponible.</div>;
 
   return (
@@ -26,7 +27,7 @@ const handleReservation = (agence) => {
             <p className="text-primary font-bold text-lg mb-4">{offer.price}€</p>
             <button
               className="bg-primary text-white px-5 py-2 rounded-full hover:bg-dark"
-onClick={() => handleReservation(agence)}            >
+onClick={() => handleReservation(offer)}            >
               Réserver cette offre
             </button>
           </div>
