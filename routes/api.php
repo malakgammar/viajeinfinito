@@ -23,25 +23,6 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('blogs', BlogController::class)->only(['index','show','store']);
     Route::post('/contact', [ContactController::class, 'store']);
 
-    // Tours
-    Route::prefix('tours')->group(function () {
-        Route::get('/adventure', [TourController::class, 'adventure'])->name('tours.adventure');
-        Route::get('/culture', [TourController::class, 'culture'])->name('tours.culture');
-    });
-
-    // Destinations
-    Route::prefix('destinations')->group(function () {
-        Route::get('/europe', [DestinationController::class, 'europe'])->name('destinations.europe');
-        Route::get('/asia', [DestinationController::class, 'asia'])->name('destinations.asia');
-        Route::get('/africa', [DestinationController::class, 'africa'])->name('destinations.africa');
-    });
-
-    // Hotels
-    Route::prefix('hotel')->group(function () {
-        Route::get('/5star', [HotelController::class, 'fiveStar'])->name('hotel.5star');
-        Route::get('/budget', [HotelController::class, 'budget'])->name('hotel.budget');
-    });
-    
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         // Authentication
