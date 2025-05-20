@@ -25,17 +25,17 @@ export default function Adherer() {
   const plans = {
     basic: {
       name: "Basique",
-      price: "9.99€",
+      price: "999.99MAD",
       features: ["Profil partenaire", "5 annonces/mois", "Support standard"]
     },
     pro: {
       name: "Professionnel",
-      price: "19.99€",
+      price: "1999.99MAD",
       features: ["Profil partenaire", "Annonces illimitées", "Support prioritaire", "Mise en avant"]
     },
     premium: {
       name: "Premium",
-      price: "29.99€",
+      price: "2999.99MAD",
       features: ["Profil partenaire", "Annonces illimitées", "Support 24/7", "Mise en avant", "Statistiques avancées"]
     }
   };
@@ -51,7 +51,7 @@ export default function Adherer() {
         cardDetails
       });
       
-      navigate('/partener/dashboard', { state: { subscription: response.data } });
+      navigate('/partner/dashboard', { state: { subscription: response.data } });
     } catch (error) {
       console.error("Erreur lors de l'adhésion:", error);
       setIsProcessing(false);
