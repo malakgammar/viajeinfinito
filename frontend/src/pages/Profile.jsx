@@ -22,7 +22,7 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    api.get('/user/profile')
+    api.get('/profile')
       .then(res => {
         setUser(res.data);
         setEditName(res.data.name);
@@ -58,7 +58,7 @@ export default function Profile() {
 
   const handleSaveEdit = (e) => {
     e.preventDefault();
-    api.put('/user/profile', {
+    api.put('/profile', {
       name: editName,
       email: editEmail,
       telephone: editTelephone,
@@ -88,7 +88,7 @@ export default function Profile() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, type: "spring" }}
         className="max-w-4xl w-full bg-base rounded-3xl shadow-lg p-8 md:p-12 flex flex-col gap-12 relative"
-        style={{ 
+        style={{
           border: `2px solid ${colors.primary}30`,
           boxShadow: `0 10px 30px ${colors.primary}15`
         }}
@@ -232,7 +232,7 @@ export default function Profile() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
-                        style={{ backgroundColor: colors.secondary + '40' }}
+                        style={{ backgroundColor: `${colors.secondary}40` }}
                       >
                         <div className="p-6 pt-0">
                           <h4 className="font-semibold mb-2" style={{ color: colors.primary }}>
@@ -295,7 +295,7 @@ export default function Profile() {
                 <div 
                   className="absolute -top-32 -right-32 w-64 h-64 rounded-full"
                   style={{ 
-                    backgroundColor: colors.primary + '20',
+                    backgroundColor: `${colors.primary}20`,
                     filter: 'blur(60px)'
                   }}
                 />
@@ -326,7 +326,7 @@ export default function Profile() {
                     onChange={(e) => setEditName(e.target.value)}
                     className="w-full p-3 rounded-lg border focus:ring-2 focus:outline-none"
                     style={{ 
-                      borderColor: colors.primary + '50',
+                      borderColor: `${colors.primary}50`,
                       focusRingColor: colors.primary,
                       color: colors.primary
                     }}
@@ -350,7 +350,7 @@ export default function Profile() {
                     onChange={(e) => setEditTelephone(e.target.value)}
                     className="w-full p-3 rounded-lg border focus:ring-2 focus:outline-none"
                     style={{ 
-                      borderColor: colors.primary + '50',
+                      borderColor: `${colors.primary}50`,
                       focusRingColor: colors.primary,
                       color: colors.primary
                     }}
@@ -374,7 +374,7 @@ export default function Profile() {
                     onChange={(e) => setEditEmail(e.target.value)}
                     className="w-full p-3 rounded-lg border focus:ring-2 focus:outline-none"
                     style={{ 
-                      borderColor: colors.primary + '50',
+                      borderColor: `${colors.primary}50`,
                       focusRingColor: colors.primary,
                       color: colors.primary
                     }}
@@ -390,7 +390,7 @@ export default function Profile() {
                     whileTap={{ scale: 0.97 }}
                     className="px-6 py-3 rounded-full font-semibold flex-1 flex items-center justify-center gap-2"
                     style={{ 
-                      backgroundColor: colors.secondary + '80',
+                      backgroundColor: `${colors.secondary}80`,
                       color: colors.primary
                     }}
                   >

@@ -8,6 +8,7 @@ import Blog from './pages/Blog';
 import Profile from './pages/Profile';
 import PartnerDashboard from "./pages/PartnerDashboard";
 import Footer from './components/Footer';
+import AgenceOffres from "./pages/AgenceOffres";
 import Personnaliser from './pages/Personnaliser';
 import ConfirmationPage from './pages/ConfirmationPage';
 
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/blog" element={<Blog />}/>
+        <Route path="/agence/:id" element={<AgenceOffres />} />
         <Route path="/personnaliser" element={<Personnaliser />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const agencesData = [
   {
@@ -7,6 +8,15 @@ const agencesData = [
     image: "https://source.unsplash.com/400x300/?beach",
     description: "Découvrez nos destinations paradisiaques avec des prix attractifs !",
     price: 899,
+    offers: [
+      {
+        id: 101,
+        title: "Séjour à Bali",
+        description: "7 jours à Bali dans un hôtel 4 étoiles",
+        price: 1200,
+        image: "https://source.unsplash.com/400x300/?bali"
+      },
+    ]
   },
   {
     id: 2,
@@ -14,14 +24,23 @@ const agencesData = [
     image: "https://source.unsplash.com/400x300/?mountain",
     description: "Partez à l’aventure avec nos circuits 100% personnalisables.",
     price: 1290,
+    offers: [
+      {
+        id: 201,
+        title: "Randonnée dans les Alpes",
+        description: "3 jours avec guide dans les Alpes",
+        price: 850,
+        image: "https://source.unsplash.com/400x300/?hiking"
+      },
+    ]
   },
 ];
 
 export default function Agences() {
+  const navigate = useNavigate();
 
   const handleReservation = (agence) => {
-    alert(`Vous avez réservé chez ${agence.name}`);
-    // Naviguer ou envoyer les données au backend
+    navigate(`/agence/${agence.id}`, { state: agence });
   };
 
   return (

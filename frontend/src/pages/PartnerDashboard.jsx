@@ -29,8 +29,8 @@ export default function PartnerDashboard({ currentUser }) {
     const fetchData = async () => {
       try {
         const [offresResponse, reservationsResponse] = await Promise.all([
-          api.get('/user/offres'),
-          api.get('/user/reservations')
+          api.get('/offres'),
+          api.get('/reservations')
         ]);
         setPackages(offresResponse.data);
         setReservations(reservationsResponse.data);
