@@ -1,29 +1,23 @@
 <?php
 
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
     {
-        User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin', // Ajout du rôle si nécessaire
-            // 'email_verified_at' => now(), // Supprime cette ligne si elle existe
-        ]);
+        // Appelle tes seeders ici
         $this->call([
-            CarteNeigeDataSeeder::class,
-            CarteEcartRrAbhDataSeeder::class,
-            ObsmetMarocDataSeeder::class,
-            PlancheQuotidienneDataSeeder::class,
-            SatelliteStandardDataSeeder::class,
-            SatelliteDeveloppeDataSeeder::class,
-
+            ContactSeeder::class,
+            BlogSeeder::class,
+            OffreSeeder::class,
+        UserSeeder::class,
+        ReservationSeeder::class,
         ]);
     }
 }

@@ -83,7 +83,7 @@ export default function App() {
 
                 {/* Routes protégées - Admin */}
                 <Route
-                  path="/admin/*"
+                  path="/admin"
                   element={
                     <RequireAuth>
                       <RequireRole allowedRoles={['admin']}>

@@ -59,7 +59,7 @@ export default function AdminAgences() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   // Préparation des données pour les graphiques
-  const chartData = agencies.map(agency => ({
+  const chartData = agencies.map(agency => ({ 
     name: agency.name,
     Réservations: agency.reservations,
     Statut: agency.status === "active" ? 1 : 0

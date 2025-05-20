@@ -9,10 +9,13 @@ import Profile from './pages/Profile';
 import Admin from './pages/Admin';
 import PartnerDashboard from "./pages/PartnerDashboard";
 import Footer from './components/Footer';
+import AgenceOffres from "./pages/AgenceOffres";
 import Personnaliser from './pages/Personnaliser';
 import ConfirmationPage from './pages/ConfirmationPage';
+import ResetPassword from './pages/ResetPassword';
 
-export default function App() {
+
+export default function App() { 
   return (
     <Router>
       <Header />
@@ -23,10 +26,12 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/blog" element={<Blog />}/>
+        <Route path="/agence/:id" element={<AgenceOffres />} />
         <Route path="/personnaliser" element={<Personnaliser />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <Footer />
     </Router>

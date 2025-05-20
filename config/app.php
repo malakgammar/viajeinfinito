@@ -54,6 +54,14 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Frontend URL (pour liens dans les notifications, ex. mot de passe oublié)
+    |--------------------------------------------------------------------------
+    */
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

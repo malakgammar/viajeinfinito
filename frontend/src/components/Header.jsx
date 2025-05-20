@@ -5,9 +5,9 @@ import api from '../api';
 
 const navItems = [
   { label: 'Home', links: [
-      { name: 'Overview', path: '/home/overview' },
-      { name: 'Stories', path: '/home/stories' },
-      { name: 'Tips', path: '/home/tips' }
+      { name: 'À propos', path: '/about' },
+      { name: 'Blog Communautaire', path: '/blog' },
+      { name: 'Contactez-nous', path: '/contact' }
     ]
   },
   { label: 'Tours', links: [
@@ -22,22 +22,11 @@ const navItems = [
       { name: 'Africa', path: '/destinations/africa' }
     ]
   },
-  { label: 'Activities', links: [
-      { name: 'Hiking', path: '/activities/hiking' },
-      { name: 'Snorkeling', path: '/activities/snorkeling' },
-      { name: 'Cooking', path: '/activities/cooking' }
-    ]
-  },
+
   { label: 'Hotel', links: [
       { name: '5-Star', path: '/hotel/5star' },
       { name: 'Budget', path: '/hotel/budget' },
       { name: 'Boutique', path: '/hotel/boutique' }
-    ]
-  },
-  { label: 'Tickets', links: [
-      { name: 'Museums', path: '/tickets/museums' },
-      { name: 'Transport', path: '/tickets/transport' },
-      { name: 'Parks', path: '/tickets/parks' }
     ]
   }
 ];
@@ -51,7 +40,7 @@ export default function Header() {
     // Vérifie si l'utilisateur est connecté
     const fetchUser = async () => {
       try {
-        const res = await api.get('/v1/profile');
+        const res = await api.get('/profile');
         setUser(res.data);
       } catch (err) {
         setUser(null);
