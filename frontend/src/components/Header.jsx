@@ -13,7 +13,6 @@ const navItems = [
   { label: 'Tours', links: [
       { name: 'Adventure', path: '/tours/adventure' },
       { name: 'Culture', path: '/tours/culture' },
-      { name: 'Custom', path: '/tours/custom' }
     ]
   },
   { label: 'Destinations', links: [
@@ -26,7 +25,6 @@ const navItems = [
   { label: 'Hotel', links: [
       { name: '5-Star', path: '/hotel/5star' },
       { name: 'Budget', path: '/hotel/budget' },
-      { name: 'Boutique', path: '/hotel/boutique' }
     ]
   }
 ];

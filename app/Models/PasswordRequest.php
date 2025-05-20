@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PasswordRequest extends Model
 {
-    protected $table = 'password_requests'; // 🔥 ajoute ceci !
+    protected $table = 'password_requests'; 
 
     protected $fillable = ['user_id', 'reason'];
     

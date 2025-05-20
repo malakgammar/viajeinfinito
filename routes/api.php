@@ -7,6 +7,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OffreController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\TourController;
+use App\Http\Controllers\DestinationController;
+use App\Http\Controllers\Hotels;
+
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
