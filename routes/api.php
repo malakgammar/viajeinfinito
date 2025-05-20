@@ -13,16 +13,23 @@ use App\Http\Controllers\Hotels;
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'sendResetLinkEmail']);
+Route::get('/reset-password/{token}', fn() => null)
+     ->middleware('guest')
+     ->name('password.reset');
+    
     
     // Blogs and contact
     Route::apiResource('blogs', BlogController::class)->only(['index','show','store']);
     Route::post('/contact', [ContactController::class, 'store']);
-
+ 
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         // Authentication

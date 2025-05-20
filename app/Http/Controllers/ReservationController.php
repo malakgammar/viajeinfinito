@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reservation;
+
 class ReservationController extends Controller
 {
     /**
@@ -24,6 +25,8 @@ class ReservationController extends Controller
             'date' => 'required|date',
             'duration' => 'required|integer|min:1'
         ]);
+        $table->string('etat')->default('En attente');
+
 
         $reservation = Reservation::create($validated);
         return response()->json($reservation, 201);
@@ -56,5 +59,15 @@ class ReservationController extends Controller
 {
     $reservation->delete();
     return response()->noContent();
+}
+
+public function userReservations(Request $request)
+{
+    $user = $request->user(); // utilisateur connecté
+    $reservations = Reservation::with('offre')
+        ->where('id_user', $user->id)
+        ->get();
+
+    return response()->json($reservations);
 }
 }
