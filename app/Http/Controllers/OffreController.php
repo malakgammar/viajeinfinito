@@ -6,15 +6,18 @@ use App\Models\Offre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class OffreController extends Controller
 {
     /**
-     * Affiche la liste des offres
-     */ 
-    public function index()
+     * Affiche toutes les offres de l'agence
+     */
+     public function index()
     {
-        $offres = Offre::with(['user', 'reservations'])->get();
+        $offres = Offre::with(['agence', 'reservations'])
+            ->whereHas('agence', function($query) {
+                $query->where('user_id', Auth::id());
+            })->get();
+
         return response()->json($offres);
     }
 
@@ -23,21 +26,32 @@ class OffreController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            
+        $data = $request->validate([
+            'agence_id' => [
+                'required',
+                'exists:agences,id',
+                function ($attribute, $value, $fail) {
+                    if (!Auth::user()->agences()->where('id', $value)->exists()) {
+                        $fail("Cette agence ne vous appartient pas.");
+                    }
+                }
+            ],
             'destination' => 'required|string|max:255',
             'date' => 'required|date',
             'duration' => 'required|integer|min:1',
             'travelers' => 'required|integer|min:1',
             'budget' => 'required|numeric|min:0',
-            'status' => 'sometimes|string|in:disponible,reservee,terminee',
             'description' => 'required|string',
-            'url_image' => 'required|url'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-        $validated['user_id'] = Auth::id();
 
-        $offre = Offre::create($validated);
-        return response()->json($offre, 201);
+        // Traitement de l'image
+        $path = $request->file('image')->store('offres/images', 'public');
+        $data['url_image'] = $path;
+
+        $offre = Offre::create($data);
+
+        return response()->json($offre->load('agence'), 201);
     }
 
     /**
@@ -45,54 +59,51 @@ class OffreController extends Controller
      */
     public function show(Offre $offre)
     {
-        return response()->json($offre->load(['user', 'reservations']));
+        $this->authorize('view', $offre);
+        return response()->json($offre);
     }
 
     /**
      * Met à jour une offre
      */
-    public function update(Request $request, Offre $offre)
+ public function update(Request $request, Offre $offre)
     {
-        if ($request->user()->id !== $offre->user_id) {
-        return response()->json(['message' => 'Unauthorized'], 403);
-    }
-        $validated = $request->validate([
+        $this->authorize('update', $offre);
+
+        $data = $request->validate([
             'destination' => 'sometimes|string|max:255',
             'date' => 'sometimes|date',
             'duration' => 'sometimes|integer|min:1',
             'travelers' => 'sometimes|integer|min:1',
             'budget' => 'sometimes|numeric|min:0',
-            'status' => 'sometimes|string|in:disponible,reservee,terminee',
+            'status' => 'sometimes|in:disponible,complet',
             'description' => 'sometimes|string',
-            'url_image' => 'sometimes|url'
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048' // Changé ici aussi
         ]);
 
-        $offre->update($validated);
+        // Traitement du nouveau fichier image
+        if ($request->hasFile('image')) {
+            // Supprime l'ancienne image si elle existe
+            if ($offre->url_image) {
+                Storage::disk('public')->delete($offre->url_image);
+            }
+            
+            $path = $request->file('image')->store('offres/images', 'public');
+            $data['url_image'] = $path;
+        }
+
+        $offre->update($data);
+
         return response()->json($offre);
     }
 
     /**
      * Supprime une offre
      */
-   public function destroy(Offre $offre)
-{
-    if (auth()->user()->id !== $offre->user_id) {
-        return response()->json(['message' => 'Unauthorized'], 403);
+    public function destroy(Offre $offre)
+    {
+        $this->authorize('delete', $offre);
+        $offre->delete();
+        return response()->json(null, 204);
     }
-
-    $offre->delete();
-    return response()->json(null, 204);
-}
-
-    /**
-     * Récupère les offres d'un utilisateur spécifique
-     */
-    public function userOffres(Request $request)
-{
-    $userId = $request->user()->id;
-    $offres = Offre::where('user_id', $userId)
-                  ->with(['reservations'])
-                  ->get();
-    return response()->json($offres);
-}
 }

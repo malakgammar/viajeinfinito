@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { InstagramIcon, FacebookIcon, TwitterIcon } from '../components/SocialIcons';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../api";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -17,9 +17,9 @@ export default function Contact() {
   // 1) Configure axios – si vous lancez 'npm run dev', votre front tourne sur 3000
   //    et votre API sur 8000. Pensez aussi à définir "proxy" dans package.json.
   useEffect(() => {
-    axios.defaults.baseURL = 'http://127.0.0.1:8000';
+    api.defaults.baseURL = 'http://127.0.0.1:8000';
     // Pour recevoir un JSON clair en cas d’erreur 422
-    axios.defaults.headers.common['Accept'] = 'application/json';
+    api.defaults.headers.common['Accept'] = 'application/json';
   }, []);
 
   const handleChange = (e) => {
@@ -39,7 +39,7 @@ export default function Contact() {
     setErrorMessages({});
 
     try {
-      const response = await axios.post('/api/contact', formData);
+      const response = await api.post('/contact', formData);
 
       if (response.status === 201 && response.data.success) {
         setSubmitMessage('Message envoyé avec succès !');

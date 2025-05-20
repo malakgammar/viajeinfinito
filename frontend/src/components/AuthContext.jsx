@@ -19,6 +19,7 @@ const ConfirmationPage = lazy(() => import('./pages/ConfirmationPage'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
 const AdminPage = lazy(() => import('./pages/Admin'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Adherer = lazy(() => import('./pages/adherer'));
 
 export default function App() {
   return (
@@ -44,6 +45,16 @@ export default function App() {
                     <RequireAuth>
                       <RequireRole allowedRoles={['client']}>
                         <Profile />
+                      </RequireRole>
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/adherer"
+                  element={
+                    <RequireAuth>
+                      <RequireRole allowedRoles={['client']}>
+                        <Adherer />
                       </RequireRole>
                     </RequireAuth>
                   }
