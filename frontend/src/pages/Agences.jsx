@@ -7,6 +7,7 @@ export default function Agences() {
   const [agences, setAgences] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,8 +26,14 @@ export default function Agences() {
     fetchAgences();
   }, []);
 
+  // Filtrage par nom ou adresse (insensible à la casse)
+  const filteredAgences = agences.filter(({ name, address }) =>
+    (name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+    (address?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+  );
+
   const handleVoirOffres = (agenceId) => {
-    navigate(`/agences/${agenceId}/offres`);
+    navigate(`/offres`);
   };
 
   if (isLoading) {
@@ -58,16 +65,27 @@ export default function Agences() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-4xl font-bold mb-12 text-center text-[#73946B]"
+          className="text-4xl font-bold mb-6 text-center text-[#73946B]"
         >
           Nos Agences Partenaires
         </motion.h1>
-        
-        {agences.length === 0 ? (
+
+        {/* Barre de recherche */}
+        <div className="mb-8 max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Rechercher par nom ou adresse..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-[#73946B]"
+          />
+        </div>
+
+        {filteredAgences.length === 0 ? (
           <p className="text-center text-gray-500">Aucune agence disponible pour le moment</p>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {agences.map((agence, index) => (
+            {filteredAgences.map((agence, index) => (
               <motion.div
                 key={agence.id}
                 initial={{ opacity: 0, y: 20 }}

@@ -1,168 +1,151 @@
-import React, { useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
-export default function Confirmation() {
+export default function ConfirmationReservation() {
   const { state } = useLocation();
-  const navigate = useNavigate();
-  const { reservation, offer } = state || {};
-  const pdfRef = useRef();
+  const offre = state?.offre || {};
+  const [nbPersonne, setNbPersonne] = useState(1);
+  const [date, setDate] = useState('');
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
-  useEffect(() => {
-    if (!reservation || !offer) {
-      navigate("/", { replace: true });
-    }
-  }, [reservation, offer, navigate]);
+  const total = nbPersonne * (offre.prix || 0);
 
-  const generatePDF = async () => {
-    const element = pdfRef.current;
-    const canvas = await html2canvas(element, { 
-      scale: 2,
-      backgroundColor: "#F8F8F8"
-    });
-    const imgData = canvas.toDataURL("image/png");
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Facture de Réservation', 14, 20);
 
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4"
-    });
+    doc.setFontSize(12);
+    doc.text(`Offre : ${offre.nom}`, 14, 40);
+    doc.text(`Agence : ${offre.agenceName}`, 14, 48);
+    doc.text(`Durée : ${offre.duration} jours`, 14, 56);
+    doc.text(`Nombre de personnes : ${nbPersonne}`, 14, 64);
+    doc.text(`Date : ${date}`, 14, 72);
+    doc.text(`Total : ${total} DH`, 14, 80);
 
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const imgProps = pdf.getImageProperties(imgData);
-    const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-    pdf.save(`confirmation_viajeinfinito_${reservation.id}.pdf`);
+    doc.save('facture_reservation.pdf');
   };
 
-  if (!reservation || !offer) return null;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      id_user: 1, // à remplacer avec l'utilisateur connecté
+      id_offre: offre.id,
+      nbPersonne,
+      total,
+      date,
+      duration: offre.duration,
+    };
+
+    try {
+      await fetch('http://localhost:8000/api/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      setIsConfirmed(true);
+      generatePDF();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <div className="min-h-screen pt-24 px-4 bg-[#F8F8F8] pb-12">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-3xl mx-auto"
-      >
-        {/* En-tête de confirmation */}
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-            className="inline-block bg-[#D2D0A0] p-4 rounded-full mb-4"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="48" 
-              height="48" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="#73946B" 
-              strokeWidth="1.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            >
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-          </motion.div>
-          <h1 className="text-3xl font-bold text-[#73946B] mb-2">Réservation confirmée !</h1>
-          <p className="text-gray-600">Votre référence: #{reservation.id}</p>
+<div className="flex justify-center items-start min-h-screen bg-[#f8f9fa] pt-24">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-2xl border border-gray-200">
+        <h2 className="text-3xl font-bold text-center text-[#73946B] mb-6">Confirmation de Réservation</h2>
+
+        <div className="space-y-3 mb-6 text-gray-700">
+          <p><span className="font-semibold">Offre :</span> {offre.nom}</p>
+          <p><span className="font-semibold">Agence :</span> {offre.agenceName}</p>
+          <p><span className="font-semibold">Durée :</span> {offre.duration} jours</p>
+          <p><span className="font-semibold">Prix par personne :</span> {offre.prix} DH</p>
         </div>
 
-        {/* Carte de confirmation */}
-        <div 
-          ref={pdfRef} 
-          className="bg-white rounded-xl shadow-lg overflow-hidden border border-[#D2D0A0]"
-        >
-          {/* En-tête de la carte */}
-          <div className="bg-[#73946B] p-6 text-white">
-            <h2 className="text-xl font-bold">{offer.destination}</h2>
-            <p className="text-[#D2D0A0]">{offer.title}</p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-medium text-sm">Nombre de personnes :</label>
+            <input
+              type="number"
+              value={nbPersonne}
+              onChange={(e) => setNbPersonne(parseInt(e.target.value))}
+              min="1"
+              required
+              className="w-full border rounded-md p-2"
+            />
           </div>
 
-          {/* Corps de la carte */}
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-[#73946B] mb-4">Détails du voyage</h3>
-                <ul className="space-y-3">
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Date de départ:</span>
-                    <span className="font-medium">{new Date(reservation.date).toLocaleDateString()}</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Durée:</span>
-                    <span className="font-medium">{reservation.duration} jours</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Voyageurs:</span>
-                    <span className="font-medium">{reservation.nbPersonne} personne{reservation.nbPersonne > 1 ? 's' : ''}</span>
-                  </li>
-                </ul>
-              </div>
+          <div>
+            <label className="block font-medium text-sm">Date du voyage :</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+              className="w-full border rounded-md p-2"
+            />
+          </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-[#73946B] mb-4">Récapitulatif</h3>
-                <ul className="space-y-3">
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Prix unitaire:</span>
-                    <span className="font-medium">{offer.price}€/pers.</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span className="text-gray-600">Total:</span>
-                    <motion.span 
-                      key={reservation.total}
-                      initial={{ scale: 1.1 }}
-                      animate={{ scale: 1 }}
-                      className="font-bold text-[#73946B]"
-                    >
-                      {reservation.total}€
-                    </motion.span>
-                  </li>
-                </ul>
+          <div className="bg-gray-100 p-4 rounded-md">
+            <h3 className="text-lg font-semibold mb-2 text-[#73946B]">Paiement par carte</h3>
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Numéro de carte"
+                required
+                className="w-full border rounded-md p-2"
+              />
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="MM/AA"
+                  required
+                  className="w-full border rounded-md p-2"
+                />
+                <input
+                  type="text"
+                  placeholder="CVV"
+                  required
+                  className="w-full border rounded-md p-2"
+                />
               </div>
-            </div>
-
-            <div className="bg-[#F8F8F8] p-4 rounded-lg">
-              <h4 className="text-sm font-semibold text-[#73946B] mb-2">Informations supplémentaires</h4>
-              <p className="text-sm text-gray-600">
-                Vous recevrez un email de confirmation avec tous les détails de votre voyage. 
-                Pensez à vérifier votre boîte de réception et vos spams.
-              </p>
+              <input
+                type="text"
+                placeholder="Nom du titulaire"
+                required
+                className="w-full border rounded-md p-2"
+              />
             </div>
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={generatePDF}
-            className="bg-[#73946B] text-white px-6 py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Télécharger la confirmation
-          </motion.button>
+          <div>
+            <label className="block font-medium text-sm">Montant total :</label>
+            <input
+              type="text"
+              value={`${total} DH`}
+              readOnly
+              className="w-full border bg-gray-100 rounded-md p-2"
+            />
+          </div>
 
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate("/")}
-            className="bg-white border border-[#73946B] text-[#73946B] px-6 py-3 rounded-lg font-semibold"
+          <button
+            type="submit"
+            className="w-full bg-[#73946B] hover:bg-[#5e7e59] text-white font-medium py-2 rounded-md transition"
           >
-            Retour à l'accueil
-          </motion.button>
-        </div>
-      </motion.div>
+            Confirmer et Payer
+          </button>
+
+          {isConfirmed && (
+            <p className="text-green-600 font-semibold text-center mt-4">
+              ✅ Réservation confirmée ! La facture est téléchargée.
+            </p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
