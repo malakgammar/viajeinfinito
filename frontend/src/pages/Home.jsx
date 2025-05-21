@@ -280,48 +280,9 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Explore by Type */}
-      <section className="px-6 py-16 max-w-7xl mx-auto">
-        <motion.h2 
-          className="text-3xl font-bold text-primary mb-12 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          Explorer par type
-        </motion.h2>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { label: "Aventure", img: "https://images.unsplash.com/photo-1570129477492-45c003edd2be" },
-            { label: "Culture", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c" },
-            { label: "Plage", img: "https://images.unsplash.com/photo-1523413651479-597eb2da0ad6" },
-            { label: "Montagne", img: "https://images.unsplash.com/photo-1503596476-1c12f9fdbf9e" },
-          ].map(({ label, img }, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1, duration: 0.5 }}
-              whileHover={{ y: -10 }}
-              className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl text-center cursor-pointer transition-all duration-300"
-            >
-              <div className="mx-auto mb-4 h-20 w-20 rounded-full overflow-hidden border-2 border-primary">
-                <img
-                  src={img}
-                  alt={label}
-                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-              <p className="font-medium text-lg">{label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-    </div>
+</div>
   );
 }
+
+
+
