@@ -209,7 +209,7 @@ const resetForm = () => {
                   {/* Prix */}
                   <div>
                     <label className="block text-sm font-medium mb-1" style={{ color: colors.dark }}>
-                      Prix (€) <span className="text-red-500">*</span>
+                      Prix (MAD) <span className="text-red-500">*</span>
                     </label>
                     <input type="number" value={newPackage.price}
                       onChange={e => setNewPackage({...newPackage, price: e.target.value})}
@@ -350,7 +350,7 @@ const resetForm = () => {
                         <span className="px-3 py-1 rounded-full text-sm font-semibold"
                           style={{ backgroundColor: colors.primary + '20', color: colors.primary }}
                         >
-                          {pkg.budget} €
+                          {pkg.budget} MAD
                         </span>
                       </div>
                       <div className="flex justify-end gap-3 mt-4 pt-4" style={{ borderTop: `1px solid ${colors.secondary}` }}>

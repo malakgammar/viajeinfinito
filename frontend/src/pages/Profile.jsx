@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
-
 import api from "../api";
 
 export default function Profile() {
@@ -10,12 +9,48 @@ export default function Profile() {
   const token = localStorage.getItem('token');
 
   const [user, setUser] = useState(null);
-  const [reservations, setReservations] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editTelephone, setEditTelephone] = useState("");
   const [expandedTrip, setExpandedTrip] = useState(null);
+
+  // Données statiques pour les réservations
+  const [reservations, setReservations] = useState([
+    {
+      id: 1,
+      destination: "Séjour à Marrakech",
+      date: "15-20 Juin 2023",
+      status: "Confirmée",
+      duration: "5 jours",
+      travelers: 2,
+      budget: "1 200 MAD",
+      description: "Séjour luxueux dans un riad traditionnel avec visite des jardins Majorelle et balade en montgolfière.",
+      image: "https://images.unsplash.com/photo-1518544866330-95a3296179f0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: 2,
+      destination: "Circuit Sahara",
+      date: "10-15 Septembre 2023",
+      status: "Terminée",
+      duration: "6 jours",
+      travelers: 4,
+      budget: "2 800 MAD",
+      description: "Expérience inoubliable dans le désert avec nuit sous les tentes berbères et excursion en dromadaire.",
+      image: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: 3,
+      destination: "Week-end à Chefchaouen",
+      date: "5-7 Novembre 2023",
+      status: "Annulée",
+      duration: "3 jours",
+      travelers: 1,
+      budget: "450 MAD",
+      description: "Découverte de la ville bleue et randonnée dans les montagnes du Rif.",
+      image: "https://images.unsplash.com/photo-1580502304784-8985b7eb7260?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+    }
+  ]);
 
   const colors = {
     primary: '#73946B',
@@ -31,9 +66,7 @@ export default function Profile() {
         setEditName(res.data.name);
         setEditEmail(res.data.email);
         setEditTelephone(res.data.telephone || '');
-        return api.get('/user/reservations');
       })
-      .then(res => setReservations(res.data))
       .catch(err => {
         console.error("Erreur API:", err.response?.data || err.message);
         if (err.response?.status === 401) {
@@ -47,18 +80,14 @@ export default function Profile() {
     localStorage.removeItem('token');
     navigate("/auth");
   };
-const handleCancelReservation = async (id) => {
-  if (window.confirm("Voulez-vous vraiment annuler cette réservation ?")) {
-    try {
-      await axios.put(`http://localhost:8000/api/reservations/${id}`, { etat: "Annulée" }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setReservations(prev => prev.map(r => r.id === id ? { ...r, etat: "Annulée" } : r));
-    } catch (err) {
-      console.error(err);
+
+  const handleCancelReservation = (id) => {
+    if (window.confirm("Voulez-vous vraiment annuler cette réservation ?")) {
+      setReservations(prev => prev.map(r => 
+        r.id === id ? { ...r, status: "Annulée" } : r
+      ));
     }
-  }
-};
+  };
 
   const openEditModal = () => {
     setEditName(user.name);
@@ -137,60 +166,58 @@ const handleCancelReservation = async (id) => {
             </p>
           </div>
           
-<div className="flex flex-wrap justify-center md:justify-start gap-4">
-  <motion.button
-    onClick={openEditModal}
-    whileHover={{ scale: 1.05, y: -3 }}
-    whileTap={{ scale: 0.95 }}
-    className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
-    style={{ 
-      backgroundColor: colors.primary,
-      color: colors.base
-    }}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-    </svg>
-    Modifier mes infos
-  </motion.button>
+          <div className="flex flex-wrap justify-center md:justify-start gap-4">
+            <motion.button
+              onClick={openEditModal}
+              whileHover={{ scale: 1.05, y: -3 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
+              style={{ 
+                backgroundColor: colors.primary,
+                color: colors.base
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Modifier mes infos
+            </motion.button>
 
-  {/* Nouveau bouton pour réserver une offre */}
-  <motion.button
-    onClick={() => navigate('/agences')}
-    whileHover={{ scale: 1.05, y: -3 }}
-    whileTap={{ scale: 0.95 }}
-    className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
-    style={{ 
-      backgroundColor: colors.secondary,
-      color: colors.primary
-    }}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-    </svg>
-    Réserver une offre
-  </motion.button>
+            <motion.button
+              onClick={() => navigate('/agences')}
+              whileHover={{ scale: 1.05, y: -3 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
+              style={{ 
+                backgroundColor: colors.secondary,
+                color: colors.primary
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              Réserver une offre
+            </motion.button>
 
-  <motion.button
-    onClick={() => navigate('/adherer')}
-    whileHover={{ scale: 1.05, y: -3 }}
-    whileTap={{ scale: 0.95 }}
-    className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
-    style={{ 
-      backgroundColor: colors.secondary,
-      color: colors.primary
-    }}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-    Devenir Partenaire
-  </motion.button>
-</div>
-          
+            <motion.button
+              onClick={() => navigate('/adherer')}
+              whileHover={{ scale: 1.05, y: -3 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 rounded-full font-semibold shadow-md flex items-center gap-2"
+              style={{ 
+                backgroundColor: colors.secondary,
+                color: colors.primary
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Devenir Partenaire
+            </motion.button>
+          </div>
         </div>
 
-        {/* Historique réservations */}
+        {/* Section Réservations - Version améliorée */}
         <section>
           <div className="flex items-center mb-8 gap-4 justify-center md:justify-start">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
@@ -203,7 +230,7 @@ const handleCancelReservation = async (id) => {
                 borderBottom: `3px solid ${colors.secondary}`
               }}
             >
-              Mes réservations
+              Historique de Mes Réservations
             </h2>
           </div>
           
@@ -225,50 +252,100 @@ const handleCancelReservation = async (id) => {
                   className="rounded-xl overflow-hidden"
                   style={{ 
                     backgroundColor: colors.base,
-                    boxShadow: `0 5px 15px ${colors.primary}10`
+                    boxShadow: `0 5px 15px ${colors.primary}10`,
+                    border: `1px solid ${colors.secondary}`
                   }}
                 >
-                  <div 
-                    className="p-6 cursor-pointer"
-                    onClick={() => toggleTripDetails(trip.id)}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-xl font-bold mb-1" style={{ color: colors.primary }}>
-                          {trip.destination}
-                        </h3>
-                        <div className="flex items-center gap-2 mb-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span style={{ color: colors.primary }}>{trip.date}</span>
-                        </div>
-                      </div>
-                      <span 
-                        className={`px-3 py-1 rounded-full text-xs font-bold ${trip.status === "Terminée" ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
-                      >
-                        {trip.status}
-                      </span>
+                  <div className="flex flex-col md:flex-row">
+                    {/* Image de la destination */}
+                    <div className="md:w-1/3 h-48 md:h-auto overflow-hidden">
+                      <img 
+                        src={trip.image} 
+                        alt={trip.destination}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     
-                    <div className="flex flex-wrap gap-4 mt-4">
-                      <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span style={{ color: colors.primary }}>{trip.duration}</span>
+                    {/* Détails de la réservation */}
+                    <div className="p-6 md:w-2/3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-xl font-bold mb-1" style={{ color: colors.primary }}>
+                            {trip.destination}
+                          </h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span style={{ color: colors.primary }}>{trip.date}</span>
+                          </div>
+                        </div>
+                        <span 
+                          className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            trip.status === "Confirmée" ? 'bg-green-100 text-green-800' : 
+                            trip.status === "Terminée" ? 'bg-blue-100 text-blue-800' : 
+                            'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {trip.status}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span style={{ color: colors.primary }}>{trip.travelers} personne{trip.travelers > 1 ? 's' : ''}</span>
+                      
+                      <div className="flex flex-wrap gap-4 mt-4">
+                        <div className="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span style={{ color: colors.primary }}>{trip.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                          <span style={{ color: colors.primary }}>{trip.travelers} personne{trip.travelers > 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span style={{ color: colors.primary }}>{trip.budget}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke={colors.primary}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span style={{ color: colors.primary }}>Budget: {trip.budget}</span>
+
+                      <div className="mt-4 flex justify-between items-center">
+                        <button 
+                          onClick={() => toggleTripDetails(trip.id)}
+                          className="text-sm font-medium flex items-center gap-1"
+                          style={{ color: colors.primary }}
+                        >
+                          {expandedTrip === trip.id ? (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                              </svg>
+                              Moins de détails
+                            </>
+                          ) : (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                              Plus de détails
+                            </>
+                          )}
+                        </button>
+
+                        {trip.status === "Confirmée" && (
+                          <button 
+                            onClick={() => handleCancelReservation(trip.id)}
+                            className="text-sm text-red-500 hover:underline flex items-center gap-1"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Annuler
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -281,25 +358,45 @@ const handleCancelReservation = async (id) => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden"
-                        style={{ backgroundColor: `${colors.secondary}40` }}
+                        style={{ backgroundColor: `${colors.secondary}20` }}
                       >
                         <div className="p-6 pt-0">
                           <h4 className="font-semibold mb-2" style={{ color: colors.primary }}>
-                            Description du voyage
+                            Détails du voyage
                           </h4>
-                          <p className="text-sm" style={{ color: colors.primary }}>
+                          <p className="mb-4" style={{ color: colors.primary }}>
                             {trip.description}
                           </p>
+                          
+                          <div className="flex flex-wrap gap-4 mt-4">
+                            <button className="px-4 py-2 rounded-lg flex items-center gap-2"
+                              style={{ 
+                                backgroundColor: `${colors.primary}10`,
+                                color: colors.primary
+                              }}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Facture
+                            </button>
+                            
+                            <button className="px-4 py-2 rounded-lg flex items-center gap-2"
+                              style={{ 
+                                backgroundColor: `${colors.primary}10`,
+                                color: colors.primary
+                              }}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                              </svg>
+                              Itinéraire
+                            </button>
+                          </div>
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <button onClick={() => handleCancelReservation(trip.id)}
-                  className="mt-4 text-sm text-red-500 hover:underline"
-                  >
-                  Annuler la réservation
-                </button>
-
                 </motion.div>
               ))}
             </div>
@@ -325,7 +422,7 @@ const handleCancelReservation = async (id) => {
           </motion.button>
         </div>
 
-        {/* Modal Edition */}
+        {/* Modal Edition (inchangé) */}
         <AnimatePresence>
           {isEditing && (
             <motion.div

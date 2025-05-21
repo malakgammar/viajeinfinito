@@ -111,7 +111,7 @@ export default function ReservationForm() {
             <h1 className="text-2xl font-bold">Réserver l'offre</h1>
             {offer && (
               <p className="mt-2 text-[#D2D0A0]">
-                {offer.destination} - {offer.price}€/personne/jour
+                {offer.destination} - {offer.price}MAD/personne/jour
               </p>
             )}
           </div>
@@ -217,7 +217,7 @@ export default function ReservationForm() {
                 <div>
                   <span className="text-lg font-medium">Total:</span>
                   <p className="text-sm text-gray-500">
-                    {form.nbPersonne} personne{form.nbPersonne > 1 ? 's' : ''} × {form.duration} jour{form.duration > 1 ? 's' : ''} × {offer?.price}€
+                    {form.nbPersonne} personne{form.nbPersonne > 1 ? 's' : ''} × {form.duration} jour{form.duration > 1 ? 's' : ''} × {offer?.price}MAD
                   </p>
                 </div>
                 <motion.div
@@ -228,7 +228,7 @@ export default function ReservationForm() {
                   className="text-2xl font-bold"
                   style={{ color: "#73946B" }}
                 >
-                  {total}€
+                  {total}MAD
                 </motion.div>
               </div>
 
