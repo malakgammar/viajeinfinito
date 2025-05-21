@@ -1,89 +1,25 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Models;
 
-use Illuminate\Http\Request;
-use App\Models\Reservation;
+use Illuminate\Database\Eloquent\Model;
 
-class ReservationController extends Controller
+class Reservation extends Model
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $fillable = [
+        'user_id', 'offre_id',
+        'nbPersonne', 'total',
+        'date', 'duration',
+        'etat',
+    ];
+
+    public function user()
     {
-        return response()->json(Reservation::with(['user', 'offre'])->get());
+        return $this->belongsTo(User::class);
     }
 
-    public function store(Request $request)
+    public function offre()
     {
-        $validated = $request->validate([
-            'user_id'   => 'required|exists:users,id',
-  'offre_id'  => 'required|exists:offres,id',
-            'nbPersonne' => 'required|integer|min:1',
-            'total' => 'required|numeric',
-            'date' => 'required|date',
-            'duration' => 'required|integer|min:1'
-        ]);
-        $table->string('etat')->default('En attente');
-
-
-        $reservation = Reservation::create($validated);
-        return response()->json($reservation, 201);
+        return $this->belongsTo(Offre::class);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Reservation $reservation)
-{
-
-    $reservation->update(['etat' => $validated['etat']]);
-    return response()->json($reservation);
-}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Reservation $reservation)
-{
-    $reservation->delete();
-    return response()->noContent();
-}
-
-public function userReservations(Request $request)
-{
-    $user = $request->user(); // utilisateur connecté
-    $reservations = Reservation::with('offre')
-        ->where('id_user', $user->id)
-        ->get();
-
-    return response()->json($reservations);
-}
-
-public function myReservations(Request $request)
-{
-    $agenceIds = $request->user()->agences()->pluck('id');
-
-    $reservations = Reservation::with(['user','offre'])
-        ->whereIn('offre_id', function($q) use($agenceIds){
-            $q->select('id')
-              ->from('offres')
-              ->whereIn('agence_id', $agenceIds);
-        })
-        ->get();
-
-    return response()->json($reservations);
-}
-
-
-
 }

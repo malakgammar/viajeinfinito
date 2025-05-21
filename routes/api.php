@@ -25,7 +25,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/reset-password/{token}', fn() => null)
          ->middleware('guest')
          ->name('password.reset');
-    
+    Route::apiResource('agences', AgenceController::class)->only(['index']);
+
     // Blogs and contact
     Route::apiResource('blogs', BlogController::class)->only(['index','show','store']);
     Route::post('/contact', [ContactController::class, 'store']);

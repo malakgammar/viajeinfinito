@@ -13,15 +13,23 @@ class OffreController extends Controller
     /**
      * Affiche toutes les offres de l'agence
      */
-     public function index()
-    {
+public function index()
+{
+    // Vérifie si l'utilisateur est un partenaire (agence)
+    if (Auth::user()->hasRole('partenaire')) {
         $offres = Offre::with(['agence', 'reservations'])
             ->whereHas('agence', function($query) {
                 $query->where('user_id', Auth::id());
             })->get();
-
-        return response()->json($offres);
+    } else {
+        // Pour les clients ou utilisateurs non authentifiés
+        $offres = Offre::with(['agence', 'reservations'])
+            ->get();
     }
+
+    return response()->json($offres);
+}
+
 
     /**
      * Crée une nouvelle offre

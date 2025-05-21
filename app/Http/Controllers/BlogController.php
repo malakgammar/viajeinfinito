@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -21,46 +20,47 @@ class BlogController extends Controller
      */
     public function store(Request $request)
     {
+        // 1. Validation des champs
         $validated = $request->validate([
             'nom'         => 'required|string|max:255',
             'email'       => 'required|email',
             'description' => 'required|string',
             'images'      => 'nullable|array',
-            'images.*'    => 'image|max:2048', // max 2 Mo par image
+            'images.*'    => 'image|max:2048', // max 2 Mo par image
         ]);
 
+        // 2. Traitement des fichiers
         $imagePaths = [];
-
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
+                // stocke dans storage/app/public/reviews et renvoie le chemin /storage/reviews/xxx.jpg
                 $path = $image->store('reviews', 'public');
-                $imagePaths[] = Storage::url($path); // ex: /storage/reviews/xyz.jpg
+                $imagePaths[] = Storage::url($path);
             }
         }
 
+        // 3. Création du modèle
         $blog = Blog::create([
             'nom'         => $validated['nom'],
             'email'       => $validated['email'],
             'description' => $validated['description'],
-            'image'       => json_encode($imagePaths), // stocké en JSON dans la BDD
+            // si votre colonne s’appelle toujours `image` vous pouvez encoder en JSON :
+            // 'image'     => json_encode($imagePaths),
+            // sinon, si vous avez renommé en `images` et casté en array :
+            'images'      => $imagePaths,
         ]);
 
         return response()->json($blog, 201);
     }
 
+    /**
+     * Afficher un avis.
+     */
     public function show(string $id)
     {
         $blog = Blog::findOrFail($id);
         return response()->json($blog);
     }
 
-    public function update(Request $request, string $id)
-    {
-        // Optionnel : logique de mise à jour si tu ajoutes un panneau admin
-    }
-
-    public function destroy(string $id)
-    {
-        // Optionnel : suppression d’un avis
-    }
+    // update() et destroy() à compléter selon vos besoins
 }

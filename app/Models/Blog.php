@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
 class Blog extends Model
 {
-    protected $fillable = ['nom', 'email', 'description', 'image'];
+    protected $fillable = [
+      'nom',
+      'email',
+      'description',
+      'images',    // <— pluriel
+    ];
 
     protected $casts = [
-    'image' => 'array',
-];
-} 
+      'images' => 'array',   // JSON ↔ array PHP
+    ];
+}
