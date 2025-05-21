@@ -18,8 +18,8 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_user' => 'required|exists:users,id',
-            'id_offre' => 'required|exists:offres,id',
+            'user_id'   => 'required|exists:users,id',
+  'offre_id'  => 'required|exists:offres,id',
             'nbPersonne' => 'required|integer|min:1',
             'total' => 'required|numeric',
             'date' => 'required|date',
@@ -45,9 +45,7 @@ class ReservationController extends Controller
      */
     public function update(Request $request, Reservation $reservation)
 {
-    $validated = $request->validate([
-      'etat' => 'required|string|in:Confirmée,Annulée'
-    ]);
+
     $reservation->update(['etat' => $validated['etat']]);
     return response()->json($reservation);
 }
@@ -70,4 +68,22 @@ public function userReservations(Request $request)
 
     return response()->json($reservations);
 }
+
+public function myReservations(Request $request)
+{
+    $agenceIds = $request->user()->agences()->pluck('id');
+
+    $reservations = Reservation::with(['user','offre'])
+        ->whereIn('offre_id', function($q) use($agenceIds){
+            $q->select('id')
+              ->from('offres')
+              ->whereIn('agence_id', $agenceIds);
+        })
+        ->get();
+
+    return response()->json($reservations);
+}
+
+
+
 }

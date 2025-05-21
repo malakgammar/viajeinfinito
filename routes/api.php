@@ -38,22 +38,29 @@ Route::prefix('v1')->group(function () {
         // User profile
         Route::get('/profile', [UserController::class, 'getProfile']);
         Route::put('/profile', [UserController::class, 'updateProfile']);
-        
+   
+
         // Forfaits and subscriptions
         Route::get('/forfaits', [ForfaitController::class, 'index']);
         Route::post('/subscribe', [PaymentController::class, 'subscribe']);
         Route::apiResource('agences', AgenceController::class)->only(['index','store']);
+
+// Offres
+
+    Route::get('/my-reservations', [ReservationController::class,'myReservations']);
+    Route::put('/reservations/{reservation}', [ReservationController::class,'update']);
+    Route::delete('/reservations/{reservation}', [ReservationController::class,'destroy']);
+
         
-        // Admin blog routes
-        Route::apiResource('blogs', BlogController::class)->except(['index','show','store']);
+
         
         // Routes requiring active subscription
         Route::middleware('subscription.active')->group(function() {
-           
-            Route::apiResource('offres', OffreController::class);
-            Route::get('my-reservations', [ReservationController::class, 'forPartner']);
-            Route::put('reservations/{id}', [ReservationController::class, 'update']);
-            Route::delete('reservations/{id}', [ReservationController::class, 'destroy']);
+                Route::get('/offres', [OffreController::class,'index']);
+    Route::post('/offres', [OffreController::class,'store']);
+    Route::put('/offres/{offre}', [OffreController::class,'update']);
+    Route::delete('/offres/{offre}', [OffreController::class,'destroy']);
+
         });
 
         // Existing routes (keep these if they're still needed)

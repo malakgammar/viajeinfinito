@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -14,20 +13,20 @@ class Offre extends Model
         'duration',
         'travelers',
         'budget',
+        'status',
         'description',
-        'url_image'
+        'url_image',
     ];
 
+    // Pour que ton front React puisse lire o.image_url
     protected $appends = ['image_url'];
 
-    protected $casts = [
-        'date' => 'date',
-        'budget' => 'decimal:2'
-    ];
-
-    public function getImageUrlAttribute()
+    public function getImageUrlAttribute(): ?string
     {
-        return $this->url_image ? Storage::url($this->url_image) : null;
+        // Si url_image est vide, retourne null
+        return $this->url_image
+            ? Storage::disk('public')->url($this->url_image)
+            : null;
     }
 
     public function agence()
