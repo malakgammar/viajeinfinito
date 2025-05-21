@@ -1,20 +1,42 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Offre extends Model
 {
     protected $fillable = [
-        'user_id', 'destination', 'date', 'duration', 
-        'travelers', 'budget', 'status', 'description', 'url_image'
+        'agence_id',
+        'destination',
+        'date',
+        'duration',
+        'travelers',
+        'budget',
+        'description',
+        'url_image'
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
+    protected $appends = ['image_url'];
+
+    protected $casts = [
+        'date' => 'date',
+        'budget' => 'decimal:2'
+    ];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->url_image ? Storage::url($this->url_image) : null;
     }
 
-    public function reservations() {
-        return $this->hasMany(Reservation::class, 'id_offre');
+    public function agence()
+    {
+        return $this->belongsTo(Agence::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 }

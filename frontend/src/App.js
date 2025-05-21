@@ -14,6 +14,7 @@ import AgenceOffres from "./pages/AgenceOffres";
 import ConfirmationPage from './pages/ConfirmationPage';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
+import Adherer from './pages/adherer';
 
 export default function App() { 
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/adherer" element={<Adherer />} />
         <Route path="/notfound" element={<NotFound />} />
         <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
       </Routes>

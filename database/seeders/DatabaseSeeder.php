@@ -16,8 +16,10 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,
             BlogSeeder::class,
             OffreSeeder::class,
-        UserSeeder::class,
-        ReservationSeeder::class,
+            UserSeeder::class,
+            ReservationSeeder::class,
+            ForfaitsTableSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
