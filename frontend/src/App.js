@@ -29,7 +29,7 @@ export default function App() {
         <Route path="/blog" element={<Blog />}/>
         <Route path="/reservation" element={<ReservationForm />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
-        <Route path="/agence/:id" element={<AgenceOffres />} />
+        <Route path="/agences/:id/offres" element={<AgenceOffres />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />   
         <Route path="/partner/dashboard" element={<PartnerDashboard />} />
         <Route path="/auth" element={<Auth />} />

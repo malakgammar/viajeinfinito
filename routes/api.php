@@ -25,7 +25,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/reset-password/{token}', fn() => null)
          ->middleware('guest')
          ->name('password.reset');
-    
+    Route::apiResource('agences', AgenceController::class)->only(['index']);
+
     // Blogs and contact
     Route::apiResource('blogs', BlogController::class)->only(['index','show','store']);
     Route::post('/contact', [ContactController::class, 'store']);
@@ -38,11 +39,12 @@ Route::prefix('v1')->group(function () {
         // User profile
         Route::get('/profile', [UserController::class, 'getProfile']);
         Route::put('/profile', [UserController::class, 'updateProfile']);
+        Route::apiResource('offres', OffreController::class);
         
         // Forfaits and subscriptions
         Route::get('/forfaits', [ForfaitController::class, 'index']);
         Route::post('/subscribe', [PaymentController::class, 'subscribe']);
-        Route::apiResource('agences', AgenceController::class)->only(['index','store']);
+        Route::apiResource('agences', AgenceController::class)->only(['store']);
         
         // Admin blog routes
         Route::apiResource('blogs', BlogController::class)->except(['index','show','store']);

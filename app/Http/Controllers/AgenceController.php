@@ -11,9 +11,9 @@ class AgenceController extends Controller
 {
     public function index()
     {
-        $agences = Auth::user()->agences()->with(['offres', 'user'])->get();
-        return response()->json($agences);
+        return Agence::all();
     }
+
 
     public function store(Request $request)
     {

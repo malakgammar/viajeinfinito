@@ -1,35 +1,30 @@
-import React from "react";
-import { useLocation,useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function AgenceOffres() {
-  const location = useLocation();
-  const agence = location.state;
-const navigate = useNavigate();
+  const { id } = useParams();
+  const [offres, setOffres] = useState([]);
 
-const handleReservation = (offer) => {
-  navigate("/reservation", { state: { offer } });
-};
-
-  if (!agence) return <div className="pt-20 text-center">Aucune donnée disponible.</div>;
+  useEffect(() => {
+    axios.get(`http://localhost:8000/api/v1/agences/${id}/offres`)
+      .then(response => {
+        setOffres(response.data);
+      })
+      .catch(error => {
+        console.error("Erreur lors du chargement des offres:", error);
+      });
+  }, [id]);
 
   return (
     <div className="pt-20 px-6 min-h-screen bg-white">
-      <h1 className="text-3xl font-bold mb-8 text-center text-dark">{agence.name} - Offres</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-        {agence.offers.map((offer) => (
-          <div
-            key={offer.id}
-            className="bg-gray-100 rounded-2xl p-6 shadow hover:shadow-xl transition"
-          >
-            <img src={offer.image} alt={offer.title} className="rounded-xl h-48 w-full object-cover mb-4" />
-            <h2 className="text-xl font-semibold text-dark mb-2">{offer.title}</h2>
-            <p className="text-gray-700 mb-3">{offer.description}</p>
-            <p className="text-primary font-bold text-lg mb-4">{offer.price}€</p>
-            <button
-              className="bg-primary text-white px-5 py-2 rounded-full hover:bg-dark"
-onClick={() => handleReservation(offer)}            >
-              Réserver cette offre
-            </button>
+      <h1 className="text-3xl font-bold mb-8 text-center text-green-700">Offres de l'agence</h1>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {offres.map(offre => (
+          <div key={offre.id} className="bg-gray-50 rounded-xl shadow p-4">
+            <h2 className="text-lg font-bold">{offre.titre}</h2>
+            <p className="text-sm text-gray-600">{offre.description}</p>
+            <p className="text-sm mt-2 text-green-700 font-semibold">{offre.prix} €</p>
           </div>
         ))}
       </div>
