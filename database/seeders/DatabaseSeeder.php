@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             OffreSeeder::class,
         UserSeeder::class,
         ReservationSeeder::class,
+        ForfaitsTableSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

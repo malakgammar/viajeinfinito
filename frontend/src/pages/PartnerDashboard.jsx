@@ -42,50 +42,63 @@ export default function PartnerDashboard({ currentUser }) {
     fetchData();
   }, []);
 
-  const handleAddPackage = async () => {
-    try {
-      if (!currentUser) {
-        console.error("No current user available");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('user_id', currentUser.id);
-      formData.append('destination', newPackage.title);
-      formData.append('description', newPackage.description);
-      formData.append('budget', newPackage.price);
-      formData.append('date', newPackage.date);
-      formData.append('duration', newPackage.duration);
-      formData.append('travelers', newPackage.travelers);
-      
-      if (newPackage.image instanceof File) {
-        formData.append('image', newPackage.image);
-      }
-
-      const response = await api.post('/offres', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      setPackages(prev => [...prev, response.data]);
-      setNewPackage({ 
-        title: "", 
-        description: "", 
-        price: "", 
-        image: "",
-        date: "",
-        duration: "",
-        travelers: ""
-      });
-      setIsAddingPackage(false);
-    } catch (err) {
-      console.error("Error adding package:", err);
+const handleAddPackage = async () => {
+  try {
+    if (!currentUser?.agence?.id) {
+      console.error("No agency found for current user");
+      return;
     }
-  };
 
-  // Rest of your component code remains the same...
-  // [Keep all other functions and JSX unchanged]
+    const formData = new FormData();
+    formData.append('agence_id', currentUser.agence.id);
+    formData.append('destination', newPackage.title);
+    formData.append('description', newPackage.description);
+    formData.append('budget', newPackage.price);
+    formData.append('date', newPackage.date);
+    formData.append('duration', newPackage.duration);
+    formData.append('travelers', newPackage.travelers);
+    
+    // Ensure image is properly appended
+    if (newPackage.image) {
+      formData.append('image', newPackage.image);
+    }
+
+    // Get auth token (adjust based on your auth storage)
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+    const response = await api.post('/offres', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    setPackages(prev => [...prev, response.data]);
+    resetForm();
+    setIsAddingPackage(false);
+    
+  } catch (err) {
+    console.error("Error adding package:", {
+      error: err,
+      response: err.response?.data
+    });
+    // Add user-friendly error handling here
+  }
+};
+
+// Helper function to reset form
+const resetForm = () => {
+  setNewPackage({ 
+    title: "", 
+    description: "", 
+    price: "", 
+    image: null,
+    date: "",
+    duration: "",
+    travelers: ""
+  });
+};
+
 
   const handleEditPackage = (id) => {
     const pkg = packages.find(p => p.id === id);

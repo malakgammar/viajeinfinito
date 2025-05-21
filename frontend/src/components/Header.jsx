@@ -13,7 +13,6 @@ const navItems = [
   { label: 'Tours', links: [
       { name: 'Adventure', path: '/tours/adventure' },
       { name: 'Culture', path: '/tours/culture' },
-      { name: 'Custom', path: '/tours/custom' }
     ]
   },
   { label: 'Destinations', links: [
@@ -26,7 +25,6 @@ const navItems = [
   { label: 'Hotel', links: [
       { name: '5-Star', path: '/hotel/5star' },
       { name: 'Budget', path: '/hotel/budget' },
-      { name: 'Boutique', path: '/hotel/boutique' }
     ]
   }
 ];
@@ -40,7 +38,7 @@ export default function Header() {
     // Vérifie si l'utilisateur est connecté
     const fetchUser = async () => {
       try {
-        const res = await api.get('/user/profile');
+        const res = await api.get('/profile');
         setUser(res.data);
       } catch (err) {
         setUser(null);

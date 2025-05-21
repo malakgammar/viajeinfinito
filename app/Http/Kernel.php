@@ -44,5 +44,6 @@ class Kernel extends HttpKernel
         // Autres middlewares...
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
         'can:is-partner' => \App\Http\Middleware\IsPartner::class,
+        'subscription.active' => \App\Http\Middleware\CheckSubscription::class,
     ];
 }

@@ -229,7 +229,7 @@ const generateInvoice = () => {
                 Date d'expiration <span className="text-red-500">*</span>
               </label>
               <input
-                type="date"
+                type="text"
                 placeholder="MM/AA"
                 value={cardInfo.expiry}
                 onChange={(e) => setCardInfo({ ...cardInfo, expiry: e.target.value })}
