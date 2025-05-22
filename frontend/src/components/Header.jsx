@@ -11,20 +11,20 @@ const navItems = [
     ]
   },
   { label: 'Tours', links: [
-      { name: 'Adventure', path: '/tours/adventure' },
-      { name: 'Culture', path: '/tours/culture' },
+      { name: 'Adventure', path: '/offres' },
+      { name: 'Culture', path: '/offres' },
     ]
   },
   { label: 'Destinations', links: [
-      { name: 'Europe', path: '/destinations/europe' },
-      { name: 'Asia', path: '/destinations/asia' },
-      { name: 'Africa', path: '/destinations/africa' }
+      { name: 'Europe', path: '/offres' },
+      { name: 'Asia', path: '/offres' },
+      { name: 'Africa', path: '/offres' }
     ]
   },
 
   { label: 'Hotel', links: [
-      { name: '5-Star', path: '/hotel/5star' },
-      { name: 'Budget', path: '/hotel/budget' },
+      { name: '5-Star', path: '/offres' },
+      { name: 'Budget', path: '/offres' },
     ]
   }
 ];
