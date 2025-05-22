@@ -60,7 +60,7 @@ export default function Personnaliser() {
           </div>
 
           <div>
-            <label className="block text-dark font-medium mb-1">Budget (€)</label>
+            <label className="block text-dark font-medium mb-1">Budget (MAD)</label>
             <input
               type="number"
               name="budget"
