@@ -23,7 +23,6 @@ export default function AdminAgences() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     phone: '',
     address: '',
     description: '',
@@ -215,21 +214,6 @@ export default function AdminAgences() {
             </div>
 
             <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email<span className="text-red-500"> *</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#73946B]"
-              />
-            </div>
-
-            <div className="mb-4">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
               <input
                 type="tel"
@@ -303,7 +287,6 @@ export default function AdminAgences() {
               <thead className="bg-[#73946B] text-white">
                 <tr>
                   <th className="py-3 px-6 text-left">Nom</th>
-                  <th className="py-3 px-6 text-left">Email</th>
                   <th className="py-3 px-6 text-left">Téléphone</th>
                   <th className="py-3 px-6 text-left">Adresse</th>
                   <th className="py-3 px-6 text-left">Statut</th>
@@ -320,7 +303,6 @@ export default function AdminAgences() {
                   filteredAgencies.map(agency => (
                     <tr key={agency.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-6">{agency.name}</td>
-                      <td className="py-3 px-6">{agency.email || '-'}</td>
                       <td className="py-3 px-6">{agency.phone || '-'}</td>
                       <td className="py-3 px-6">{agency.address || '-'}</td>
                       <td className="py-3 px-6">
